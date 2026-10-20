@@ -843,64 +843,85 @@ async function connectToWhatsApp() {
                 const uptimeRemainder = uptimeSeconds % 60;
                 const usedRam = Math.round(process.memoryUsage().rss / 1024 / 1024);
                 const totalRam = Math.round(require('os').totalmem() / 1024 / 1024);
-                const menuText =
-`╭═══ VFX MINI ═══⊷
-┃❃╭────────────────
-┃❃│ Prefix : ${PREFIX}
-┃❃│ User : 𝐒ꭷᴜʀᴀᴊɪᴛ メ 𝐕𝐅𝐗
-┃❃│ Time : ${now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' })}
-┃❃│ Day : ${now.toLocaleDateString('en-IN', { weekday: 'long', timeZone: 'Asia/Kolkata' })}
-┃❃│ Date : ${now.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Asia/Kolkata' })}
-┃❃│ Version : VFX MINI
-┃❃│ RAM : ${usedRam}/${totalRam} MB
-┃❃│ Uptime : ${uptimeHours}h ${uptimeMinutes}m ${uptimeRemainder}s
-┃❃│ Platform : ${process.platform} (${require('os').type()})
-┃❃│ AutoDL : ${isAutoDL ? 'ON' : 'OFF'}
-┃❃│ Status : ${sock?.user ? 'CONNECTED' : 'STARTING'}
-┃❃╰────────────────
-╰════════════════════⊷
-
-╭─❏ ᴀɪ & sᴇᴀʀᴄʜ ❏
- │ ${PREFIX}AI <text>
- │ ${PREFIX}GOOGLE <query>
- │ ${PREFIX}WEATHER <city>
- │ ${PREFIX}QUOTE
- │ ${PREFIX}FANCY <text>
-╰─────────────────
-╭─❏ ᴅᴏᴡɴʟᴏᴀᴅ ❏
- │ ${PREFIX}PLAY <song>
- │ ${PREFIX}MP3 <song>
- │ ${PREFIX}VIDEO <query>
- │ ${PREFIX}INSTA <URL>
- │ AutoDL : send a supported public link
-╰─────────────────
-╭─❏ ᴛᴏᴏʟs ❏
- │ ${PREFIX}PING
- │ ${PREFIX}UPTIME
- │ ${PREFIX}CALC <math>
- │ ${PREFIX}QR <text>
- │ ${PREFIX}TOURL (reply to media)
- │ ${PREFIX}STICKER (reply to media)
- │ ${PREFIX}S (reply to media)
-╰─────────────────
-╭─❏ ʙᴏᴛ sᴇᴛᴛɪɴɢs ❏
- │ ${PREFIX}SETPREFIX <symbol>
- │ ${PREFIX}ALWAYSONLINE ON/OFF
- │ ${PREFIX}STATUSVIEW ON/OFF
- │ ${PREFIX}AUTOREACT ON/OFF
- │ ${PREFIX}AUTODL ON/OFF
- │ ${PREFIX}UPDATE
-╰─────────────────
-╭─❏ ɢʀᴏᴜᴘ ❏
- │ ${PREFIX}TAGALL
- │ ${PREFIX}MUTE
- │ ${PREFIX}UNMUTE
-╰─────────────────
-╭─❏ ᴏᴡɴᴇʀ ❏
- │ ${PREFIX}OWNER
-╰─────────────────
-╰━━〔 ᴘᴏᴡᴇʀᴇᴅ ʙʏ SOURАJIT VFX 〕━━╯`;
-                await sock.sendMessage(from, { text: menuText }, { quoted: msg });
+                const menuText = [
+                    '╭━━━『 ✦ 𝙑𝙁𝙓 𝙈𝙄𝙉𝙄 ✦ 』━━━╮',
+                    '┃ ⚡ *ᴘʀᴇᴍɪᴜᴍ ᴡʜᴀᴛsᴀᴘᴘ ʙᴏᴛ*',
+                    '┃ 👑 *ᴏᴡɴᴇʀ:* 𝐒ꭷᴜʀᴀᴊɪᴛ メ 𝐕𝐅𝐗',
+                    '┃ ⌨️ *ᴘʀᴇғɪx:* ' + PREFIX,
+                    '┃ 🟢 *sᴛᴀᴛᴜs:* ' + (sock?.user ? 'ᴄᴏɴɴᴇᴄᴛᴇᴅ' : 'sᴛᴀʀᴛɪɴɢ'),
+                    '┃ ⏱️ *ᴜᴘᴛɪᴍᴇ:* ' + uptimeHours + 'h ' + uptimeMinutes + 'm ' + uptimeRemainder + 's',
+                    '┃ 🧠 *ʀᴀᴍ:* ' + usedRam + '/' + totalRam + ' MB',
+                    '┃ 📥 *ᴀᴜᴛᴏ ᴅʟ:* ' + (isAutoDL ? 'ᴏɴ' : 'ᴏғғ'),
+                    '┃ 🗓️ *ᴅᴀᴛᴇ:* ' + now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'Asia/Kolkata' }),
+                    '╰━━━━━━━━━━━━━━━━━━━━━━╯',
+                    '',
+                    '╭━━〔 ✨ ᴀɪ • sᴛʏʟᴇ ✨ 〕━━╮',
+                    '┃ ◈ ' + PREFIX + 'ai <text>',
+                    '┃ ◈ ' + PREFIX + 'google <query>',
+                    '┃ ◈ ' + PREFIX + 'weather <city>',
+                    '┃ ◈ ' + PREFIX + 'quote',
+                    '┃ ◈ ' + PREFIX + 'fancy <text>',
+                    '┃ ◈ ' + PREFIX + 'font <text>',
+                    '╰━━━━━━━━━━━━━━━━━━━━━━╯',
+                    '',
+                    '╭━━〔 🎬 ᴅᴏᴡɴʟᴏᴀᴅᴇʀ 🎬 〕━━╮',
+                    '┃ ◈ ' + PREFIX + 'play <song>',
+                    '┃ ◈ ' + PREFIX + 'mp3 <song>',
+                    '┃ ◈ ' + PREFIX + 'video <name>',
+                    '┃ ◈ ' + PREFIX + 'insta <url>',
+                    '┃ ◈ ᴏᴘᴇɴ ᴘᴜʙʟɪᴄ ᴠɪᴅᴇᴏ ʟɪɴᴋ ғᴏʀ ᴀᴜᴛᴏᴅʟ',
+                    '╰━━━━━━━━━━━━━━━━━━━━━━╯',
+                    '',
+                    '╭━━〔 🧰 ᴛᴏᴏʟs 🧰 〕━━╮',
+                    '┃ ◈ ' + PREFIX + 'ping',
+                    '┃ ◈ ' + PREFIX + 'uptime',
+                    '┃ ◈ ' + PREFIX + 'calc <math>',
+                    '┃ ◈ ' + PREFIX + 'qr <text>',
+                    '┃ ◈ ' + PREFIX + 'tourl (reply media)',
+                    '┃ ◈ ' + PREFIX + 'sticker (reply image)',
+                    '╰━━━━━━━━━━━━━━━━━━━━━━╯',
+                    '',
+                    '╭━━〔 ⚙️ sᴇᴛᴛɪɴɢs ⚙️ 〕━━╮',
+                    '┃ ◈ ' + PREFIX + 'setprefix <symbol>',
+                    '┃ ◈ ' + PREFIX + 'alwaysonline on/off',
+                    '┃ ◈ ' + PREFIX + 'statusview on/off',
+                    '┃ ◈ ' + PREFIX + 'autoreact on/off',
+                    '┃ ◈ ' + PREFIX + 'autodl on/off',
+                    '┃ ◈ ' + PREFIX + 'update',
+                    '╰━━━━━━━━━━━━━━━━━━━━━━╯',
+                    '',
+                    '╭━━〔 👥 ɢʀᴏᴜᴘ ᴛᴏᴏʟs 👥 〕━━╮',
+                    '┃ ◈ ' + PREFIX + 'tagall <message>',
+                    '┃ ◈ ' + PREFIX + 'mute',
+                    '┃ ◈ ' + PREFIX + 'unmute',
+                    '╰━━━━━━━━━━━━━━━━━━━━━━╯',
+                    '',
+                    '╭━━〔 👑 ᴏᴡɴᴇʀ 👑 〕━━╮',
+                    '┃ ◈ ' + PREFIX + 'owner',
+                    '╰━━━━━━━━━━━━━━━━━━━━━━╯',
+                    '',
+                    '╰━━━『 ⚡ ᴘᴏᴡᴇʀᴇᴅ ʙʏ 𝐒𝐎𝐔𝐑𝐀𝐉𝐈𝐓 𝐕𝐅𝐗 』━━━╯'
+                ].join('\\n');
+                try {
+                    const page = await axios.get('https://ibb.co/HL6Ftn8P', { timeout: 12000 });
+                    const html = typeof page.data === 'string' ? page.data : '';
+                    const match = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)
+                        || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i);
+                    const imageUrl = match?.[1]?.replace(/&amp;/g, '&');
+                    if (imageUrl) {
+                        const imageResponse = await axios.get(imageUrl, {
+                            responseType: 'arraybuffer',
+                            timeout: 15000,
+                            headers: { 'User-Agent': 'Mozilla/5.0' }
+                        });
+                        await sock.sendMessage(from, { image: Buffer.from(imageResponse.data), caption: menuText }, { quoted: msg });
+                    } else {
+                        await sock.sendMessage(from, { text: menuText }, { quoted: msg });
+                    }
+                } catch (menuImageError) {
+                    console.error('Menu image error:', menuImageError.message);
+                    await sock.sendMessage(from, { text: menuText }, { quoted: msg });
+                }
             }
             else if (command === 'fancy' || command === 'font' || command === 'fonts') {
                 if (!args.trim()) {
