@@ -870,12 +870,23 @@ ${PREFIX}autodl on/off
                 PREFIX = args.trim();
                 await sock.sendMessage(from, { text: `✅ *Bot Prefix successfully changed to:* \`${PREFIX}\`` }, { quoted: msg });
             }
-            else if (command === 'ping') {
+            else if (command === 'ping' || command === 'ping2') {
                 const start = Date.now();
-                await sock.sendMessage(from, { text: '🚀 Speed testing...' }, { quoted: msg });
-                const end = Date.now();
-                await sock.sendMessage(from, { 
-                    text: `⚡ *VFX MINI SPEED*\n\n⏱️ *Latency:* \`${end - start} ms\`\n🟢 *Status:* Active & Online` 
+                const animated = command === 'ping2';
+                if (animated) {
+                    const frames = ['⏳ *VFX MINI*  ▰▱▱▱▱', '⚡ *VFX MINI*  ▰▰▱▱▱', '🚀 *VFX MINI*  ▰▰▰▱▱', '✨ *VFX MINI*  ▰▰▰▰▱'];
+                    for (const frame of frames) {
+                        await sock.sendMessage(from, { text: frame }, { quoted: msg });
+                        await delay(250);
+                    }
+                } else {
+                    await sock.sendMessage(from, { text: '🚀 Speed testing...' }, { quoted: msg });
+                }
+                const latency = Date.now() - start;
+                const uptimeSeconds = Math.floor(process.uptime());
+                const uptime = `${Math.floor(uptimeSeconds / 3600)}h ${Math.floor((uptimeSeconds % 3600) / 60)}m ${uptimeSeconds % 60}s`;
+                await sock.sendMessage(from, {
+                    text: `╭━━━ ⚡ *VFX MINI PING* ⚡ ━━━╮\n┃ 🚀 *Status:* Online\n┃ ⏱️ *Latency:* ${latency} ms\n┃ 🕒 *Uptime:* ${uptime}\n┃ 💾 *RAM:* ${Math.round(process.memoryUsage().rss / 1024 / 1024)} MB\n╰━━━━━━━━━━━━━━━━━━━━━━╯\n✨ Powered by SOURAJITVFX`
                 }, { quoted: msg });
             }
             else if (command === 'menu' || command === 'help') {
