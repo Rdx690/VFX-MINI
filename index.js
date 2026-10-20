@@ -504,20 +504,36 @@ app.get('/pair', async (req, res) => {
     let phone = req.query.number || '919356730236';
     let cleanedNumber = phone.replace(/[^0-9]/g, '');
 
+    if (!/^\d{10,15}$/.test(cleanedNumber)) {
+        return res.json({ error: 'Enter a valid phone number with country code.' });
+    }
     if (!sock) {
-        return res.json({ error: 'WhatsApp Socket is initialising, please wait 5 seconds and click again.' });
+        return res.json({ error: 'WhatsApp socket is starting. Wait 5 seconds and try again.' });
     }
 
     try {
-        if (!sock.authState.creds.registered) {
-            await delay(1500);
-            let code = await sock.requestPairingCode(cleanedNumber);
-            return res.json({ code: code, status: 'Success' });
-        } else {
-            return res.json({ error: 'Bot is already linked/registered!' });
+        if (sock.authState?.creds?.registered && waLoggedOut) {
+            // Preserve a backup before resetting only the auth folder; never delete the Railway volume.
+            const authDir = await getPersistentAuthDir();
+            const backupDir = path.join(path.dirname(authDir), 'session-backup-' + Date.now());
+            if (fs.existsSync(authDir)) {
+                fs.cpSync(authDir, backupDir, { recursive: true, errorOnExist: false });
+            }
+            fs.rmSync(authDir, { recursive: true, force: true });
+            fs.mkdirSync(authDir, { recursive: true });
+            res.json({ error: 'Old logged-out session was backed up and reset. Restarting bot now; wait for Railway deployment/runtime to come online, then request a new pairing code.' });
+            setTimeout(() => process.exit(0), 1200);
+            return;
         }
+
+        if (!sock.authState?.creds?.registered) {
+            await delay(1000);
+            const code = await sock.requestPairingCode(cleanedNumber);
+            return res.json({ code, status: 'Success' });
+        }
+        return res.json({ error: 'Bot is already linked/registered and not marked logged out. Do not reset the session; check Railway logs first.' });
     } catch (err) {
-        console.error("Pairing Code Generation Error:", err);
+        console.error('Pairing Code Generation Error:', err);
         return res.json({ error: 'Pairing Error: ' + err.message });
     }
 });
@@ -579,6 +595,7 @@ async function getFastVideoUrl(url) {
 
 let reconnectTimer = null;
 let isConnecting = false;
+let waLoggedOut = false;
 
 async function getPersistentAuthDir() {
     const localDir = path.resolve('session');
@@ -623,6 +640,7 @@ async function connectToWhatsApp() {
         if (connection === 'close') {
             const statusCode = lastDisconnect?.error?.output?.statusCode;
             const shouldReconnect = statusCode !== DisconnectReason.loggedOut;
+            if (!shouldReconnect) waLoggedOut = true;
             console.log('⚠️ Connection closed. Status:', statusCode, 'Reconnecting:', shouldReconnect);
             if (shouldReconnect && !reconnectTimer) {
                 reconnectTimer = setTimeout(() => {
