@@ -778,48 +778,69 @@ async function connectToWhatsApp() {
                 }, { quoted: msg });
             }
             else if (command === 'menu' || command === 'help') {
+                const now = new Date();
+                const uptimeSeconds = Math.floor(process.uptime());
+                const uptimeHours = Math.floor(uptimeSeconds / 3600);
+                const uptimeMinutes = Math.floor((uptimeSeconds % 3600) / 60);
+                const uptimeRemainder = uptimeSeconds % 60;
+                const usedRam = Math.round(process.memoryUsage().rss / 1024 / 1024);
+                const totalRam = Math.round(require('os').totalmem() / 1024 / 1024);
                 const menuText =
-`╭━━〔 ⚡ *LEVENTER × VFX MINI* 〕━━╮
-┃
-┃ 👑 *OWNER:* SOURАJIT VFX
-┃ 🧩 *BOT:* VFX-MINI
-┃ ⚙️ *AUTO-DL:* ${isAutoDL ? 'ON' : 'OFF'}
-┃ 🟢 *STATUS:* ${sock?.user ? 'CONNECTED' : 'STARTING'}
-┃ 🔣 *PREFIX:* [ \`${PREFIX}\` ]
-┃
-┣━━〔 🎛️ *SYSTEM SETTINGS* 〕━━
-┃ • \`${PREFIX}ping\` — Check response speed
-┃ • \`${PREFIX}uptime\` — Bot uptime
-┃ • \`${PREFIX}setprefix <symbol>\` — Change prefix
-┃ • \`${PREFIX}alwaysonline on/off\`
-┃ • \`${PREFIX}statusview on/off\`
-┃ • \`${PREFIX}autoreact on/off\`
-┃ • \`${PREFIX}autodl on/off\`
-┃ • \`${PREFIX}update\` — Update bot
-┃
-┣━━〔 🎧 *MUSIC & VIDEO* 〕━━
-┃ • \`${PREFIX}play <song name>\` — MP3 music
-┃ • \`${PREFIX}mp3 <song name>\` — Download audio
-┃ • \`${PREFIX}video <query>\` — Download video
-┃ • \`${PREFIX}insta <Instagram URL>\` — Instagram media
-┃ • Send a supported public link for AutoDL
-┃
-┣━━〔 🧰 *SMART TOOLS* 〕━━
-┃ • \`${PREFIX}ai <text>\` — Ask AI
-┃ • \`${PREFIX}google <query>\` — Google search
-┃ • \`${PREFIX}weather <city>\` — Weather report
-┃ • \`${PREFIX}qr <text>\` — Create QR code
-┃ • \`${PREFIX}calc <math>\` — Calculator
-┃ • \`${PREFIX}quote\` — Daily quote
-┃ • \`${PREFIX}tourl\` — Media to link
-┃ • \`${PREFIX}sticker\` / \`${PREFIX}s\` — Create sticker
-┃
-┣━━〔 👥 *GROUP COMMANDS* 〕━━
-┃ • \`${PREFIX}tagall\` — Tag group members
-┃ • \`${PREFIX}mute\` — Mute group
-┃ • \`${PREFIX}unmute\` — Unmute group
-┃
-╰━━〔 ✨ *POWERED BY SOURАJIT VFX* 〕━━╯`;
+`╭═══ LEVANTER × VFX MINI ═══⊷
+┃❃╭────────────────
+┃❃│ Prefix : ${PREFIX}
+┃❃│ User : 𝐒ꭷᴜʀᴀᴊɪᴛ メ 𝐕𝐅𝐗
+┃❃│ Time : ${now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' })}
+┃❃│ Day : ${now.toLocaleDateString('en-IN', { weekday: 'long', timeZone: 'Asia/Kolkata' })}
+┃❃│ Date : ${now.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Asia/Kolkata' })}
+┃❃│ Version : VFX MINI
+┃❃│ RAM : ${usedRam}/${totalRam} MB
+┃❃│ Uptime : ${uptimeHours}h ${uptimeMinutes}m ${uptimeRemainder}s
+┃❃│ Platform : ${process.platform} (${require('os').type()})
+┃❃│ AutoDL : ${isAutoDL ? 'ON' : 'OFF'}
+┃❃│ Status : ${sock?.user ? 'CONNECTED' : 'STARTING'}
+┃❃╰────────────────
+╰════════════════════⊷
+
+╭─❏ ᴀɪ & sᴇᴀʀᴄʜ ❏
+ │ ${PREFIX}AI <text>
+ │ ${PREFIX}GOOGLE <query>
+ │ ${PREFIX}WEATHER <city>
+ │ ${PREFIX}QUOTE
+╰─────────────────
+╭─❏ ᴅᴏᴡɴʟᴏᴀᴅ ❏
+ │ ${PREFIX}PLAY <song>
+ │ ${PREFIX}MP3 <song>
+ │ ${PREFIX}VIDEO <query>
+ │ ${PREFIX}INSTA <URL>
+ │ AutoDL : send a supported public link
+╰─────────────────
+╭─❏ ᴛᴏᴏʟs ❏
+ │ ${PREFIX}PING
+ │ ${PREFIX}UPTIME
+ │ ${PREFIX}CALC <math>
+ │ ${PREFIX}QR <text>
+ │ ${PREFIX}TOURL (reply to media)
+ │ ${PREFIX}STICKER (reply to media)
+ │ ${PREFIX}S (reply to media)
+╰─────────────────
+╭─❏ ʙᴏᴛ sᴇᴛᴛɪɴɢs ❏
+ │ ${PREFIX}SETPREFIX <symbol>
+ │ ${PREFIX}ALWAYSONLINE ON/OFF
+ │ ${PREFIX}STATUSVIEW ON/OFF
+ │ ${PREFIX}AUTOREACT ON/OFF
+ │ ${PREFIX}AUTODL ON/OFF
+ │ ${PREFIX}UPDATE
+╰─────────────────
+╭─❏ ɢʀᴏᴜᴘ ❏
+ │ ${PREFIX}TAGALL
+ │ ${PREFIX}MUTE
+ │ ${PREFIX}UNMUTE
+╰─────────────────
+╭─❏ ᴏᴡɴᴇʀ ❏
+ │ ${PREFIX}OWNER
+╰─────────────────
+╰━━〔 ᴘᴏᴡᴇʀᴇᴅ ʙʏ SOURАJIT VFX 〕━━╯`;
                 await sock.sendMessage(from, { text: menuText }, { quoted: msg });
             }
             else if (command === 'play' || command === 'song') {
