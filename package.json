@@ -1,0 +1,19 @@
+{
+  "name": "rahul-ai-mini",
+  "version": "1.0.0",
+  "description": "RAHUL-AI-MINI WhatsApp Bot",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@whiskeysockets/baileys": "^6.6.0",
+    "axios": "^1.6.8",
+    "express": "^4.19.2",
+    "pino": "^9.0.0",
+    "qrcode": "^1.5.3",
+    "qrcode-terminal": "^0.12.0",
+    "wa-sticker-formatter": "^4.4.4",
+    "yt-search": "^2.10.4"
+  }
+}
