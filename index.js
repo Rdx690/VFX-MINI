@@ -845,19 +845,39 @@ async function connectToWhatsApp() {
             }
             else if (command === 'play' || command === 'song') {
                 if (!args) return await sock.sendMessage(from, { text: `❌ Song name taka! e.g. \`${PREFIX}play Blinding Lights\`` }, { quoted: msg });
-                await sock.sendMessage(from, { text: `🎵 Searching and downloading "${args}"...` }, { quoted: msg });
+                await sock.sendMessage(from, { text: `🎵 Searching: "${args}"...\\n⚡ Preparing audio.` }, { quoted: msg });
                 try {
-                    const api = `https://api.sayan-nexuswork.workers.dev/music?query=${encodeURIComponent(args)}`;
-                    const res = await axios.get(api, { timeout: 30000 });
+                    const api = `https://api.sayan-nexuswork.workers.dev/music?query=${encodeURIComponent(args.trim())}`;
+                    const res = await axios.get(api, { timeout: 20000 });
                     const data = res.data;
-                    if (data?.status !== 'success' || !data?.url) return await sock.sendMessage(from, { text: '❌ Song not found or music API failed.' }, { quoted: msg });
+                    if (data?.status !== 'success' || !data?.url) {
+                        return await sock.sendMessage(from, { text: '❌ Song not found or music API failed.' }, { quoted: msg });
+                    }
                     const title = data.title || args;
-                    const infoText = `🎵 *VFX MINI MUSIC PLAYER* 🎵\n\n📌 *Title:* ${title}\n⏱️ *Duration:* ${data.duration || 'Unknown'}\n👀 *Views:* ${data.views || 'Unknown'}\n🎙️ *Channel:* ${data.channel || 'Unknown'}\n🎧 *Quality:* ${data.quality || 'MP3'}`;
-                    if (data.thumbnail) await sock.sendMessage(from, { image: { url: data.thumbnail }, caption: infoText }, { quoted: msg });
-                    await sock.sendMessage(from, { audio: { url: data.url }, mimetype: 'audio/mpeg', fileName: `${title.replace(/[\\/:*?"<>|]/g, '').slice(0, 80)}.mp3`, ptt: false }, { quoted: msg });
+                    const safeTitle = title.replace(/[\\/:*?"<>|]/g, '').slice(0, 80) || 'audio';
+                    const infoText = `🎵 *VFX MINI MUSIC PLAYER* 🎵\\n\\n📌 *Title:* ${title}\\n⏱️ *Duration:* ${data.duration || 'Unknown'}\\n👀 *Views:* ${data.views || 'Unknown'}\\n🎙️ *Channel:* ${data.channel || 'Unknown'}\\n🎧 *Quality:* ${data.quality || 'MP3'}`;
+                    // Fetch audio bytes explicitly to avoid Baileys URL-stream issues and signed-URL redirects.
+                    const audioRes = await axios.get(data.url, {
+                        responseType: 'arraybuffer',
+                        timeout: 60000,
+                        maxRedirects: 5,
+                        maxContentLength: 25 * 1024 * 1024,
+                        headers: { 'User-Agent': 'Mozilla/5.0' }
+                    });
+                    const audioBuffer = Buffer.from(audioRes.data);
+                    if (!audioBuffer.length) throw new Error('Audio response was empty');
+                    await sock.sendMessage(from, {
+                        audio: audioBuffer,
+                        mimetype: 'audio/mpeg',
+                        fileName: `${safeTitle}.mp3`,
+                        ptt: false
+                    }, { quoted: msg });
+                    // Send track details after audio so the main download is not delayed by thumbnail fetching.
+                    await sock.sendMessage(from, { text: infoText }, { quoted: msg });
                 } catch (err) {
-                    console.error('Music API error:', err.message);
-                    await sock.sendMessage(from, { text: '❌ Music download failed. Try again later.' }, { quoted: msg });
+                    console.error('Play audio download/send error:', err.message);
+                    const reason = err.response?.status ? `HTTP ${err.response.status}` : (err.code || err.message || 'unknown error');
+                    await sock.sendMessage(from, { text: `❌ Play failed (${reason}). Try again or use a shorter track.` }, { quoted: msg });
                 }
             }
             else if (command === 'mp3' || command === 'yta') {
