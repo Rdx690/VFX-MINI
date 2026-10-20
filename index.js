@@ -926,7 +926,7 @@ async function connectToWhatsApp() {
             else if (command === 'fancy' || command === 'font' || command === 'fonts') {
                 if (!args.trim()) {
                     return await sock.sendMessage(from, {
-                        text: `✨ *VFX MINI FANCY TEXT*\n\nUse: ` + "`${PREFIX}fancy Your Text`" + `\nExample: ` + "`${PREFIX}fancy SOURAJIT VFX`" + `
+                        text: `✨ *VFX MINI FANCY TEXT*\n\nUse: ${PREFIX}fancy Your Text\nExample: ${PREFIX}fancy SOURAJIT VFX`
                     }, { quoted: msg });
                 }
                 try {
