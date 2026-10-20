@@ -883,6 +883,11 @@ ${PREFIX}autodl on/off
                 PREFIX = args.trim();
                 await sock.sendMessage(from, { text: `✅ *Bot Prefix successfully changed to:* \`${PREFIX}\`` }, { quoted: msg });
             }
+            else if (command === 'pair') {
+                await sock.sendMessage(from, {
+                    text: '🔗 *VFX MINI PAIRING PORTAL*\n\nOpen the pairing page only if WhatsApp is actually disconnected:\nhttps://vfx-mini-production.up.railway.app\n\n⚠️ This command does not relink an already-connected session. If this bot is online, do not pair again. Keep your existing session safe.'
+                }, { quoted: msg });
+            }
             else if (command === 'ping' || command === 'ping2') {
                 const start = Date.now();
                 const animated = command === 'ping2';
@@ -941,6 +946,7 @@ ${PREFIX}autodl on/off
                     '',
                     '╭━━〔 🧰 ᴛᴏᴏʟs 🧰 〕━━╮',
                     '┃ ◈ ' + PREFIX + 'ping',
+                    '┃ ◈ ' + PREFIX + 'pair (pairing portal)',
                     '┃ ◈ ' + PREFIX + 'uptime',
                     '┃ ◈ ' + PREFIX + 'calc <math>',
                     '┃ ◈ ' + PREFIX + 'qr <text>',
