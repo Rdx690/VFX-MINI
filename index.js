@@ -525,8 +525,19 @@ app.get('/pair', async (req, res) => {
             fs.rmSync(authDir, { recursive: true, force: true });
             fs.mkdirSync(authDir, { recursive: true });
             try { fs.rmSync(loggedOutMarker, { force: true }); } catch (_) {}
-            res.json({ error: 'Old logged-out session backed up and reset safely. Bot is restarting; wait about 15 seconds, refresh this page, and request the pairing code again.' });
-            setTimeout(() => process.exit(0), 1200);
+            waLoggedOut = false;
+            // Recreate the WhatsApp socket in-process instead of exiting the whole web server.
+            // This keeps the pairing endpoint available and avoids Railway 502s during recovery.
+            try {
+                if (sock && typeof sock.end === 'function') sock.end(new Error('Recreating socket for fresh pairing'));
+            } catch (closeErr) {
+                console.warn('Old WhatsApp socket close warning:', closeErr.message);
+            }
+            sock = null;
+            res.json({ error: 'Old logged-out session was backed up and reset safely. WhatsApp is reinitializing now; wait 8 seconds, refresh this page, and request a new pairing code.' });
+            setTimeout(() => {
+                connectToWhatsApp().catch(err => console.error('Pairing recovery reconnect error:', err.message));
+            }, 1000);
             return;
         }
 
