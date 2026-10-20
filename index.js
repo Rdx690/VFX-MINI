@@ -694,10 +694,20 @@ async function connectToWhatsApp() {
         }
     });
 
+    // Process only newly delivered messages. Baileys can emit older/history messages
+    // as "append" during reconnect; ignoring those prevents stale commands replaying.
+    const processedMessageIds = new Set();
     sock.ev.on('messages.upsert', async (m) => {
         try {
-            const msg = m.messages[0];
-            if (!msg.message) return;
+            if (m.type !== 'notify') return;
+            const msg = m.messages?.[0];
+            if (!msg?.message || !msg.key?.id) return;
+            if (processedMessageIds.has(msg.key.id)) return;
+            processedMessageIds.add(msg.key.id);
+            if (processedMessageIds.size > 2000) {
+                const oldestId = processedMessageIds.values().next().value;
+                processedMessageIds.delete(oldestId);
+            }
 
             const from = msg.key.remoteJid;
             const text = msg.message.conversation || msg.message.extendedTextMessage?.text || msg.message.imageMessage?.caption || msg.message.videoMessage?.caption || '';
