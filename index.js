@@ -1086,13 +1086,18 @@ async function connectToWhatsApp() {
             }
             else if (command === 'ai') {
                 if (!args) return await sock.sendMessage(from, { text: `❌ Prashna taka! e.g. \`${PREFIX}ai Hello\`` }, { quoted: msg });
-                await sock.sendMessage(from, { text: '🤖 Thinking...' }, { quoted: msg });
+                await sock.sendMessage(from, { text: '🤖 *VFX AI is thinking...*' }, { quoted: msg });
                 try {
-                    const res = await axios.get(`https://api.simsimi.vn/v1/simtalk?text=${encodeURIComponent(args)}&lc=mr`);
-                    const responseText = res.data?.message || 'Uttar milale nahi.';
-                    await sock.sendMessage(from, { text: `🤖 *AI Answer:*\n\n${responseText}` }, { quoted: msg });
-                } catch {
-                    await sock.sendMessage(from, { text: `🤖 *AI Reply:* Mi VFX MINI cha assistant aahe.` }, { quoted: msg });
+                    const res = await axios.get(
+                        `https://eliteprotech-apis.zone.id/ai/chatgpt?prompt=${encodeURIComponent(args)}`,
+                        { timeout: 45000 }
+                    );
+                    const responseText = res.data?.text || res.data?.response || res.data?.message;
+                    if (res.data?.success !== true || !responseText) throw new Error('AI API returned no answer');
+                    await sock.sendMessage(from, { text: `🤖 *VFX AI Answer*\n\n${responseText}\n\n✨ Model: ${res.data?.model || 'ChatGPT'}` }, { quoted: msg });
+                } catch (e) {
+                    console.error('AI API error:', e.response?.status || e.message);
+                    await sock.sendMessage(from, { text: '❌ AI API abhi response nahi de rahi. Thodi der baad try karo.' }, { quoted: msg });
                 }
             }
             else if (command === 'tagall' && isGroup) {
