@@ -786,7 +786,7 @@ async function connectToWhatsApp() {
                 const usedRam = Math.round(process.memoryUsage().rss / 1024 / 1024);
                 const totalRam = Math.round(require('os').totalmem() / 1024 / 1024);
                 const menuText =
-`╭═══ LEVANTER × VFX MINI ═══⊷
+`╭═══ VFX MINI ═══⊷
 ┃❃╭────────────────
 ┃❃│ Prefix : ${PREFIX}
 ┃❃│ User : 𝐒ꭷᴜʀᴀᴊɪᴛ メ 𝐕𝐅𝐗
