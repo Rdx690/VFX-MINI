@@ -782,7 +782,27 @@ async function connectToWhatsApp() {
 
             if (!isCmd && command !== 'ping' && command !== 'menu') return;
 
-            if (command === 'update' || command === 'autoupdate') {
+            if (command === 'settings') {
+                const settingsText = `
+⚙️ *VFX MINI*
+*BOT SETTINGS PANEL*
+
+🟢 Always Online: ${isAlwaysOnline ? 'ON' : 'OFF'}
+👀 Auto Status View: ${isAutoStatusView ? 'ON' : 'OFF'}
+❤️ Auto React: ${isAutoReact ? 'ON' : 'OFF'}
+📥 Auto Downloader: ${isAutoDL ? 'ON' : 'OFF'}
+
+Prefix: ${PREFIX}
+
+${PREFIX}alwaysonline on/off
+${PREFIX}statusview on/off
+${PREFIX}autoreact on/off
+${PREFIX}autodl on/off
+`;
+
+                await sock.sendMessage(from, { text: settingsText }, { quoted: msg });
+            }
+            else if (command === 'update' || command === 'autoupdate') {
                 await sock.sendMessage(from, { text: '🔄 *Checking for updates & pulling latest code from GitHub...*' }, { quoted: msg });
                 exec('git pull', async (err, stdout, stderr) => {
                     if (err) return await sock.sendMessage(from, { text: `❌ *Update Failed:* ${err.message}` }, { quoted: msg });
@@ -912,6 +932,7 @@ async function connectToWhatsApp() {
                     '┃ ◈ ' + PREFIX + 'statusview on/off',
                     '┃ ◈ ' + PREFIX + 'autoreact on/off',
                     '┃ ◈ ' + PREFIX + 'autodl on/off',
+                    '┃ ◈ ' + PREFIX + 'settings',
                     '┃ ◈ ' + PREFIX + 'update',
                     '╰━━━━━━━━━━━━━━━━━━━━━━╯',
                     '',
