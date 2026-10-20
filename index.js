@@ -879,18 +879,31 @@ async function connectToWhatsApp() {
                 }
             }
             else if (command === 'video' || command === 'ytvideo') {
-                if (!args) return await sock.sendMessage(from, { text: `❌ Video name taka! e.g. \`${PREFIX}video Despacito official\`` }, { quoted: msg });
-                await sock.sendMessage(from, { text: `🎬 Searching and downloading "${args}"...` }, { quoted: msg });
+                if (!args) return await sock.sendMessage(from, { text: `❌ Video name taka! e.g. \`${PREFIX}video Tere Naam\`` }, { quoted: msg });
+                await sock.sendMessage(from, { text: `🎬 Searching: "${args}"...\\n⏳ Fetching video file, please wait.` }, { quoted: msg });
                 try {
-                    const api = `https://api.sayan-nexuswork.workers.dev/video?query=${encodeURIComponent(args)}`;
+                    const api = `https://api.sayan-nexuswork.workers.dev/video?query=${encodeURIComponent(args.trim())}`;
                     const res = await axios.get(api, { timeout: 30000 });
                     const data = res.data;
-                    if (data?.status !== 'success' || !data?.url) return await sock.sendMessage(from, { text: '❌ Video not found or video API failed.' }, { quoted: msg });
-                    const caption = `🎬 *VFX MINI VIDEO DOWNLOADER*\n\n📌 *Title:* ${data.title || args}\n⏱️ *Duration:* ${data.duration || 'Unknown'}\n👀 *Views:* ${data.views || 'Unknown'}\n🎙️ *Channel:* ${data.channel || 'Unknown'}\n🎞️ *Quality:* ${data.quality || 'MP4'}`;
-                    await sock.sendMessage(from, { video: { url: data.url }, caption }, { quoted: msg });
+                    if (data?.status !== 'success' || !data?.url) {
+                        return await sock.sendMessage(from, { text: '❌ Video not found or video API failed.' }, { quoted: msg });
+                    }
+                    const caption = `🎬 *VFX MINI VIDEO DOWNLOADER*\\n\\n📌 *Title:* ${data.title || args}\\n⏱️ *Duration:* ${data.duration || 'Unknown'}\\n👀 *Views:* ${data.views || 'Unknown'}\\n🎙️ *Channel:* ${data.channel || 'Unknown'}\\n🎞️ *Quality:* ${data.quality || 'MP4'}`;
+                    // Download bytes first; passing a signed Googlevideo URL directly to Baileys can fail on redirects/network restrictions.
+                    const videoRes = await axios.get(data.url, {
+                        responseType: 'arraybuffer',
+                        timeout: 120000,
+                        maxRedirects: 5,
+                        maxContentLength: 80 * 1024 * 1024,
+                        headers: { 'User-Agent': 'Mozilla/5.0' }
+                    });
+                    const videoBuffer = Buffer.from(videoRes.data);
+                    if (!videoBuffer.length) throw new Error('Video response was empty');
+                    await sock.sendMessage(from, { video: videoBuffer, mimetype: 'video/mp4', caption }, { quoted: msg });
                 } catch (e) {
-                    console.error('Video API error:', e.message);
-                    await sock.sendMessage(from, { text: '❌ Video download failed. Try again later.' }, { quoted: msg });
+                    console.error('Video download/send error:', e.message);
+                    const reason = e.response?.status ? `HTTP ${e.response.status}` : (e.code || e.message || 'unknown error');
+                    await sock.sendMessage(from, { text: `❌ Video download failed (${reason}). Try a shorter video or retry shortly.` }, { quoted: msg });
                 }
             }
             else if (command === 'insta' || command === 'instagram') {
