@@ -529,7 +529,12 @@ app.get('/pair', async (req, res) => {
         if (!sock.authState?.creds?.registered) {
             await delay(1000);
             const code = await sock.requestPairingCode(cleanedNumber);
-            return res.json({ code, status: 'Success' });
+            const normalizedCode = String(code || '').replace(/[^A-Z0-9]/gi, '');
+            if (normalizedCode.length < 6) {
+                console.error('Pairing API returned an invalid code:', String(code));
+                return res.json({ error: 'WhatsApp returned an invalid pairing code. Wait 10 seconds, refresh the page, and try once more. If it repeats, check Railway logs.' });
+            }
+            return res.json({ code: normalizedCode, status: 'Success' });
         }
         return res.json({ error: 'Bot is already linked/registered and not marked logged out. Do not reset the session; check Railway logs first.' });
     } catch (err) {
