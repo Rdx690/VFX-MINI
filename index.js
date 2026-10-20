@@ -879,6 +879,8 @@ async function connectToWhatsApp() {
                     '┃ ◈ ' + PREFIX + 'qr <text>',
                     '┃ ◈ ' + PREFIX + 'tourl (reply media)',
                     '┃ ◈ ' + PREFIX + 'sticker (reply image)',
+                    '┃ ◈ ' + PREFIX + 'getpp (profile photo)',
+                    '┃ ◈ ' + PREFIX + 'fullpp (full profile photo)',
                     '╰━━━━━━━━━━━━━━━━━━━━━━╯',
                     '',
                     '╭━━〔 ⚙️ sᴇᴛᴛɪɴɢs ⚙️ 〕━━╮',
@@ -921,6 +923,37 @@ async function connectToWhatsApp() {
                 } catch (menuImageError) {
                     console.error('Menu image error:', menuImageError.message);
                     await sock.sendMessage(from, { text: menuText }, { quoted: msg });
+                }
+            }
+            else if (command === 'getpp' || command === 'fullpp') {
+                try {
+                    const mentions = contextInfo?.mentionedJid || [];
+                    const quotedSender = contextInfo?.participant;
+                    const targetJid = mentions[0] || quotedSender || msg.key.participant || sock.user?.id;
+                    if (!targetJid) {
+                        return await sock.sendMessage(from, { text: '❌ Could not identify the contact. Try replying to their message or mentioning them.' }, { quoted: msg });
+                    }
+                    const ppUrl = await sock.profilePictureUrl(targetJid, 'image');
+                    if (!ppUrl) {
+                        return await sock.sendMessage(from, { text: '❌ Profile photo not available or privacy-restricted.' }, { quoted: msg });
+                    }
+                    const ppResponse = await axios.get(ppUrl, {
+                        responseType: 'arraybuffer',
+                        timeout: 20000,
+                        maxRedirects: 5,
+                        headers: { 'User-Agent': 'Mozilla/5.0' }
+                    });
+                    const ppBuffer = Buffer.from(ppResponse.data);
+                    if (!ppBuffer.length) throw new Error('Empty profile photo response');
+                    await sock.sendMessage(from, {
+                        image: ppBuffer,
+                        caption: command === 'fullpp' ? '🖼️ *VFX MINI FULL PROFILE PHOTO*' : '🖼️ *VFX MINI PROFILE PHOTO*'
+                    }, { quoted: msg });
+                } catch (err) {
+                    console.error('Profile photo command error:', err.message);
+                    await sock.sendMessage(from, {
+                        text: '❌ Profile photo nahi mil payi. Contact ki privacy settings check karo, ya command ko unke message par reply karke try karo.'
+                    }, { quoted: msg });
                 }
             }
             else if (command === 'fancy' || command === 'font' || command === 'fonts') {
