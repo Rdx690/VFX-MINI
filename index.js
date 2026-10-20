@@ -1,4 +1,6 @@
 const express = require('express');
+const fs = require('fs');
+const path = require('path');
 const { 
     default: makeWASocket, 
     useMultiFileAuthState, 
@@ -575,8 +577,35 @@ async function getFastVideoUrl(url) {
     return null;
 }
 
+let reconnectTimer = null;
+let isConnecting = false;
+
+async function getPersistentAuthDir() {
+    const localDir = path.resolve('session');
+    const volumeDir = '/data';
+    // Railway volume is mounted at /data. Copy the existing session once,
+    // before switching auth storage, so the first persistent deploy can reuse it.
+    if (fs.existsSync(volumeDir)) {
+        const persistentDir = path.join(volumeDir, 'session');
+        fs.mkdirSync(persistentDir, { recursive: true });
+        const hasPersistentFiles = fs.existsSync(persistentDir) &&
+            fs.readdirSync(persistentDir).some(name => name.endsWith('.json'));
+        if (!hasPersistentFiles && fs.existsSync(localDir)) {
+            fs.cpSync(localDir, persistentDir, { recursive: true, force: false, errorOnExist: false });
+            console.log('📦 Migrated existing WhatsApp session to persistent Railway volume.');
+        }
+        return persistentDir;
+    }
+    console.warn('⚠️ Persistent /data volume not found; using local session folder.');
+    return localDir;
+}
+
 async function connectToWhatsApp() {
-    const { state, saveCreds } = await useMultiFileAuthState('session');
+    if (isConnecting) return;
+    isConnecting = true;
+    try {
+    const authDir = await getPersistentAuthDir();
+    const { state, saveCreds } = await useMultiFileAuthState(authDir);
     const { version } = await fetchLatestBaileysVersion();
 
     sock = makeWASocket({
@@ -592,9 +621,15 @@ async function connectToWhatsApp() {
     sock.ev.on('connection.update', async (update) => {
         const { connection, lastDisconnect } = update;
         if (connection === 'close') {
-            const shouldReconnect = lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
-            console.log('⚠️ Connection closed. Reconnecting...', shouldReconnect);
-            if (shouldReconnect) connectToWhatsApp();
+            const statusCode = lastDisconnect?.error?.output?.statusCode;
+            const shouldReconnect = statusCode !== DisconnectReason.loggedOut;
+            console.log('⚠️ Connection closed. Status:', statusCode, 'Reconnecting:', shouldReconnect);
+            if (shouldReconnect && !reconnectTimer) {
+                reconnectTimer = setTimeout(() => {
+                    reconnectTimer = null;
+                    connectToWhatsApp().catch(err => console.error('Reconnect error:', err.message));
+                }, 3000);
+            }
         } else if (connection === 'open') {
             console.log('\n==================================================');
             console.log('✅ VFX MINI IS ONLINE & CONNECTED SUCCESSFULLY!');
@@ -1127,6 +1162,17 @@ async function connectToWhatsApp() {
             console.error('Error handling message:', err);
         }
     });
+    } catch (err) {
+        console.error('WhatsApp connection setup failed:', err);
+        if (!reconnectTimer) {
+            reconnectTimer = setTimeout(() => {
+                reconnectTimer = null;
+                connectToWhatsApp().catch(e => console.error('Reconnect error:', e.message));
+            }, 5000);
+        }
+    } finally {
+        isConnecting = false;
+    }
 }
 
-connectToWhatsApp();
+connectToWhatsApp().catch(err => console.error('Initial WhatsApp connection error:', err));
