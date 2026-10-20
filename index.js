@@ -948,7 +948,7 @@ async function connectToWhatsApp() {
             }
             else if (command === 'play' || command === 'song') {
                 if (!args) return await sock.sendMessage(from, { text: `❌ Song name taka! e.g. \`${PREFIX}play Blinding Lights\`` }, { quoted: msg });
-                await sock.sendMessage(from, { text: `🎵 Searching: "${args}"...\\n⚡ Preparing audio.` }, { quoted: msg });
+                await sock.sendMessage(from, { text: `🎵 Searching: "${args}"...\n⚡ Preparing audio.` }, { quoted: msg });
                 try {
                     const api = `https://api.sayan-nexuswork.workers.dev/music?query=${encodeURIComponent(args.trim())}`;
                     const res = await axios.get(api, { timeout: 20000 });
@@ -958,7 +958,7 @@ async function connectToWhatsApp() {
                     }
                     const title = data.title || args;
                     const safeTitle = title.replace(/[\\/:*?"<>|]/g, '').slice(0, 80) || 'audio';
-                    const infoText = `🎵 *VFX MINI MUSIC PLAYER* 🎵\\n\\n📌 *Title:* ${title}\\n⏱️ *Duration:* ${data.duration || 'Unknown'}\\n👀 *Views:* ${data.views || 'Unknown'}\\n🎙️ *Channel:* ${data.channel || 'Unknown'}\\n🎧 *Quality:* ${data.quality || 'MP3'}`;
+                    const infoText = `🎵 *VFX MINI MUSIC PLAYER* 🎵\n\n📌 *Title:* ${title}\n⏱️ *Duration:* ${data.duration || 'Unknown'}\n👀 *Views:* ${data.views || 'Unknown'}\n🎙️ *Channel:* ${data.channel || 'Unknown'}\n🎧 *Quality:* ${data.quality || 'MP3'}`;
                     // Fetch audio bytes explicitly to avoid Baileys URL-stream issues and signed-URL redirects.
                     const audioRes = await axios.get(data.url, {
                         responseType: 'arraybuffer',
@@ -1003,7 +1003,7 @@ async function connectToWhatsApp() {
             }
             else if (command === 'video' || command === 'ytvideo') {
                 if (!args) return await sock.sendMessage(from, { text: `❌ Video name taka! e.g. \`${PREFIX}video Tere Naam\`` }, { quoted: msg });
-                await sock.sendMessage(from, { text: `🎬 Searching: "${args}"...\\n⏳ Fetching video file, please wait.` }, { quoted: msg });
+                await sock.sendMessage(from, { text: `🎬 Searching: "${args}"...\n⏳ Fetching video file, please wait.` }, { quoted: msg });
                 try {
                     const api = `https://api.sayan-nexuswork.workers.dev/video?query=${encodeURIComponent(args.trim())}`;
                     const res = await axios.get(api, { timeout: 30000 });
@@ -1011,7 +1011,7 @@ async function connectToWhatsApp() {
                     if (data?.status !== 'success' || !data?.url) {
                         return await sock.sendMessage(from, { text: '❌ Video not found or video API failed.' }, { quoted: msg });
                     }
-                    const caption = `🎬 *VFX MINI VIDEO DOWNLOADER*\\n\\n📌 *Title:* ${data.title || args}\\n⏱️ *Duration:* ${data.duration || 'Unknown'}\\n👀 *Views:* ${data.views || 'Unknown'}\\n🎙️ *Channel:* ${data.channel || 'Unknown'}\\n🎞️ *Quality:* ${data.quality || 'MP4'}`;
+                    const caption = `🎬 *VFX MINI VIDEO DOWNLOADER*\n\n📌 *Title:* ${data.title || args}\n⏱️ *Duration:* ${data.duration || 'Unknown'}\n👀 *Views:* ${data.views || 'Unknown'}\n🎙️ *Channel:* ${data.channel || 'Unknown'}\n🎞️ *Quality:* ${data.quality || 'MP4'}`;
                     // Download bytes first; passing a signed Googlevideo URL directly to Baileys can fail on redirects/network restrictions.
                     const videoRes = await axios.get(data.url, {
                         responseType: 'arraybuffer',
