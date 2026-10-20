@@ -901,7 +901,7 @@ async function connectToWhatsApp() {
                     '╰━━━━━━━━━━━━━━━━━━━━━━╯',
                     '',
                     '╰━━━『 ⚡ ᴘᴏᴡᴇʀᴇᴅ ʙʏ 𝐒𝐎𝐔𝐑𝐀𝐉𝐈𝐓 𝐕𝐅𝐗 』━━━╯'
-                ].join('\\n');
+                ].join('\n');
                 try {
                     const page = await axios.get('https://ibb.co/HL6Ftn8P', { timeout: 12000 });
                     const html = typeof page.data === 'string' ? page.data : '';
