@@ -631,19 +631,37 @@ async function connectToWhatsApp() {
                 const urlMatch = text.match(/(https?:\/\/[^\s]+)/g);
                 if (urlMatch) {
                     const url = urlMatch[0];
-                    if (url.includes('facebook.com') || url.includes('fb.watch') || url.includes('instagram.com') || url.includes('youtu.be') || url.includes('youtube.com') || url.includes('tiktok.com')) {
+                    if (url.includes('instagram.com')) {
+                        try {
+                            await sock.sendMessage(from, { text: '📸 *Instagram AutoDL:* Downloading media...' }, { quoted: msg });
+                            const res = await axios.get(`https://api.sayan-nexuswork.workers.dev/insta?url=${encodeURIComponent(url)}`, { timeout: 30000 });
+                            const data = res.data;
+                            const mediaUrl = data?.url || data?.urls?.[0];
+                            if (data?.status === 'success' && mediaUrl) {
+                                if (data.type === 'image' || /\.jpe?g(\?|$)/i.test(mediaUrl) || /\.png(\?|$)/i.test(mediaUrl)) await sock.sendMessage(from, { image: { url: mediaUrl }, caption: '📸 *VFX MINI Instagram AutoDL*' }, { quoted: msg });
+                                else await sock.sendMessage(from, { video: { url: mediaUrl }, caption: '📸 *VFX MINI Instagram AutoDL*' }, { quoted: msg });
+                                return;
+                            }
+                        } catch (e) { console.error('Instagram AutoDL error:', e.message); }
+                    } else if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                        try {
+                            await sock.sendMessage(from, { text: '🎬 *YouTube AutoDL:* Downloading video...' }, { quoted: msg });
+                            const res = await axios.get(`https://api.sayan-nexuswork.workers.dev/video?query=${encodeURIComponent(url)}`, { timeout: 30000 });
+                            const data = res.data;
+                            if (data?.status === 'success' && data?.url) {
+                                await sock.sendMessage(from, { video: { url: data.url }, caption: `🎬 *${data.title || 'VFX MINI Video'}*\n🎞️ Quality: ${data.quality || 'MP4'}` }, { quoted: msg });
+                                return;
+                            }
+                        } catch (e) { console.error('YouTube AutoDL error:', e.message); }
+                    } else if (url.includes('facebook.com') || url.includes('fb.watch') || url.includes('tiktok.com')) {
                         await sock.sendMessage(from, { text: '🚀 *Fast AutoDL:* Downloading video...' }, { quoted: msg });
                         const videoUrl = await getFastVideoUrl(url);
                         if (videoUrl) {
-                            await sock.sendMessage(from, { 
-                                video: { url: videoUrl }, 
-                                caption: '⚡ *VFX MINI Fast AutoDL Success!*' 
-                            }, { quoted: msg });
+                            await sock.sendMessage(from, { video: { url: videoUrl }, caption: '⚡ *VFX MINI Fast AutoDL Success!*' }, { quoted: msg });
                             return;
-                        } else {
-                            await sock.sendMessage(from, { text: '❌ Video download karne me error aaya. Link public hai ki nahi check kare.' }, { quoted: msg });
                         }
                     }
+                    await sock.sendMessage(from, { text: '❌ Download failed. Make sure the post is public and try again.' }, { quoted: msg });
                 }
             }
 
@@ -786,7 +804,9 @@ async function connectToWhatsApp() {
 │
 ├ 🔹 Reply *'send'* on any Status to get Video/Image
 ├ 🔹 \`${PREFIX}play <song name>\` - Download/Play Song
-├ 🔹 \`${PREFIX}mp3 <youtube link>\` - Video to MP3 Audio
+├ 🔹 \`${PREFIX}mp3 <song name>\` - MP3 Audio
+├ 🔹 \`${PREFIX}video <query>\` - Download YouTube Video
+├ 🔹 \`${PREFIX}insta <Instagram URL>\` - Download Instagram Media
 ├ 🔹 \`${PREFIX}tourl\` - Media to Link Uploader
 ├ 🔹 \`${PREFIX}sticker\` / \`${PREFIX}s\` - Photo to Sticker
 │
@@ -809,47 +829,72 @@ async function connectToWhatsApp() {
                 await sock.sendMessage(from, { text: menuText }, { quoted: msg });
             }
             else if (command === 'play' || command === 'song') {
-                if (!args) return await sock.sendMessage(from, { text: `❌ Ganyache naav taka! e.g. \`${PREFIX}play Kesariya\`` }, { quoted: msg });
-                await sock.sendMessage(from, { text: `🔍 Searching for "${args}" on YouTube...` }, { quoted: msg });
+                if (!args) return await sock.sendMessage(from, { text: `❌ Song name taka! e.g. \`${PREFIX}play Blinding Lights\`` }, { quoted: msg });
+                await sock.sendMessage(from, { text: `🎵 Searching and downloading "${args}"...` }, { quoted: msg });
                 try {
-                    const searchResult = await yts(args);
-                    const song = searchResult.videos[0];
-                    if (!song) return await sock.sendMessage(from, { text: '❌ Kontehi gane sapadle nahi.' }, { quoted: msg });
-                    const infoText = 
-`🎵 *VFX MINI MUSIC PLAYER* 🎵
-
-📌 *Title:* ${song.title}
-⏱️ *Duration:* ${song.timestamp}
-👀 *Views:* ${song.views}
-🔗 *Link:* ${song.url}`;
-                    await sock.sendMessage(from, { 
-                        image: { url: song.thumbnail }, 
-                        caption: infoText 
-                    }, { quoted: msg });
+                    const api = `https://api.sayan-nexuswork.workers.dev/music?query=${encodeURIComponent(args)}`;
+                    const res = await axios.get(api, { timeout: 30000 });
+                    const data = res.data;
+                    if (data?.status !== 'success' || !data?.url) return await sock.sendMessage(from, { text: '❌ Song not found or music API failed.' }, { quoted: msg });
+                    const title = data.title || args;
+                    const infoText = `🎵 *VFX MINI MUSIC PLAYER* 🎵\n\n📌 *Title:* ${title}\n⏱️ *Duration:* ${data.duration || 'Unknown'}\n👀 *Views:* ${data.views || 'Unknown'}\n🎙️ *Channel:* ${data.channel || 'Unknown'}\n🎧 *Quality:* ${data.quality || 'MP3'}`;
+                    if (data.thumbnail) await sock.sendMessage(from, { image: { url: data.thumbnail }, caption: infoText }, { quoted: msg });
+                    await sock.sendMessage(from, { audio: { url: data.url }, mimetype: 'audio/mpeg', fileName: `${title.replace(/[\\/:*?"<>|]/g, '').slice(0, 80)}.mp3`, ptt: false }, { quoted: msg });
                 } catch (err) {
-                    await sock.sendMessage(from, { text: '❌ Gane shodhtana error aala.' }, { quoted: msg });
+                    console.error('Music API error:', err.message);
+                    await sock.sendMessage(from, { text: '❌ Music download failed. Try again later.' }, { quoted: msg });
                 }
             }
             else if (command === 'mp3' || command === 'yta') {
-                if (!args) return await sock.sendMessage(from, { text: `❌ YouTube link taka! e.g. \`${PREFIX}mp3 https://youtu.be/xxxx\` ` }, { quoted: msg });
-                await sock.sendMessage(from, { text: '🎵 *Converting video to MP3 audio, please wait...*' }, { quoted: msg });
+                if (!args) return await sock.sendMessage(from, { text: `❌ Song name taka! e.g. \`${PREFIX}mp3 Blinding Lights\`` }, { quoted: msg });
+                await sock.sendMessage(from, { text: '🎵 *Downloading MP3 audio, please wait...*' }, { quoted: msg });
                 try {
-                    const api = `https://api.siputzx.my.id/api/s/youtube?url=${encodeURIComponent(args)}`;
-                    const res = await axios.get(api);
-                    const audioUrl = res.data?.data?.audio || res.data?.data?.dl;
-                    const title = res.data?.data?.title || 'audio';
-                    if (audioUrl) {
-                        await sock.sendMessage(from, { 
-                            audio: { url: audioUrl }, 
-                            mimetype: 'audio/mp4', 
-                            ptt: false,
-                            fileName: `${title}.mp3`
-                        }, { quoted: msg });
+                    const api = `https://api.sayan-nexuswork.workers.dev/music?query=${encodeURIComponent(args)}`;
+                    const res = await axios.get(api, { timeout: 30000 });
+                    const data = res.data;
+                    if (data?.status === 'success' && data?.url) {
+                        const title = data.title || 'audio';
+                        await sock.sendMessage(from, { audio: { url: data.url }, mimetype: 'audio/mpeg', ptt: false, fileName: `${title.replace(/[\\/:*?"<>|]/g, '').slice(0, 80)}.mp3` }, { quoted: msg });
                     } else {
-                        await sock.sendMessage(from, { text: '❌ MP3 convert hotana error aala.' }, { quoted: msg });
+                        await sock.sendMessage(from, { text: '❌ MP3 download failed. Song not found.' }, { quoted: msg });
                     }
                 } catch (e) {
+                    console.error('MP3 API error:', e.message);
                     await sock.sendMessage(from, { text: '❌ Server error while downloading audio.' }, { quoted: msg });
+                }
+            }
+            else if (command === 'video' || command === 'ytvideo') {
+                if (!args) return await sock.sendMessage(from, { text: `❌ Video name taka! e.g. \`${PREFIX}video Despacito official\`` }, { quoted: msg });
+                await sock.sendMessage(from, { text: `🎬 Searching and downloading "${args}"...` }, { quoted: msg });
+                try {
+                    const api = `https://api.sayan-nexuswork.workers.dev/video?query=${encodeURIComponent(args)}`;
+                    const res = await axios.get(api, { timeout: 30000 });
+                    const data = res.data;
+                    if (data?.status !== 'success' || !data?.url) return await sock.sendMessage(from, { text: '❌ Video not found or video API failed.' }, { quoted: msg });
+                    const caption = `🎬 *VFX MINI VIDEO DOWNLOADER*\n\n📌 *Title:* ${data.title || args}\n⏱️ *Duration:* ${data.duration || 'Unknown'}\n👀 *Views:* ${data.views || 'Unknown'}\n🎙️ *Channel:* ${data.channel || 'Unknown'}\n🎞️ *Quality:* ${data.quality || 'MP4'}`;
+                    await sock.sendMessage(from, { video: { url: data.url }, caption }, { quoted: msg });
+                } catch (e) {
+                    console.error('Video API error:', e.message);
+                    await sock.sendMessage(from, { text: '❌ Video download failed. Try again later.' }, { quoted: msg });
+                }
+            }
+            else if (command === 'insta' || command === 'instagram') {
+                if (!args || !/instagram\\.com\\//i.test(args)) return await sock.sendMessage(from, { text: `❌ Instagram URL taka! e.g. \`${PREFIX}insta https://www.instagram.com/reel/URL\`` }, { quoted: msg });
+                await sock.sendMessage(from, { text: '📥 *Downloading Instagram media...*' }, { quoted: msg });
+                try {
+                    const api = `https://api.sayan-nexuswork.workers.dev/insta?url=${encodeURIComponent(args.trim())}`;
+                    const res = await axios.get(api, { timeout: 30000 });
+                    const data = res.data;
+                    const mediaUrl = data?.url || data?.urls?.[0];
+                    if (data?.status !== 'success' || !mediaUrl) return await sock.sendMessage(from, { text: '❌ Instagram media unavailable or API failed.' }, { quoted: msg });
+                    if (data.type === 'image' || /\\.jpe?g(\\?|$)/i.test(mediaUrl) || /\\.png(\\?|$)/i.test(mediaUrl)) {
+                        await sock.sendMessage(from, { image: { url: mediaUrl }, caption: '📸 *VFX MINI Instagram Downloader*' }, { quoted: msg });
+                    } else {
+                        await sock.sendMessage(from, { video: { url: mediaUrl }, caption: '📸 *VFX MINI Instagram Downloader*' }, { quoted: msg });
+                    }
+                } catch (e) {
+                    console.error('Instagram API error:', e.message);
+                    await sock.sendMessage(from, { text: '❌ Instagram download failed. Check that the post is public and try again.' }, { quoted: msg });
                 }
             }
             else if (command === 'tourl' || command === 'upload') {
