@@ -512,16 +512,20 @@ app.get('/pair', async (req, res) => {
     }
 
     try {
-        if (sock.authState?.creds?.registered && waLoggedOut) {
-            // Preserve a backup before resetting only the auth folder; never delete the Railway volume.
-            const authDir = await getPersistentAuthDir();
+        const authDir = await getPersistentAuthDir();
+        const loggedOutMarker = path.join(path.dirname(authDir), 'wa-logged-out.flag');
+        const confirmedLoggedOut = waLoggedOut || fs.existsSync(loggedOutMarker);
+        if (sock.authState?.creds?.registered && confirmedLoggedOut) {
+            // Only reset auth after WhatsApp returned loggedOut/401 and the user explicitly requests pairing.
+            // Keep a backup of auth files and never delete the /data volume itself.
             const backupDir = path.join(path.dirname(authDir), 'session-backup-' + Date.now());
             if (fs.existsSync(authDir)) {
                 fs.cpSync(authDir, backupDir, { recursive: true, errorOnExist: false });
             }
             fs.rmSync(authDir, { recursive: true, force: true });
             fs.mkdirSync(authDir, { recursive: true });
-            res.json({ error: 'Old logged-out session was backed up and reset. Restarting bot now; wait for Railway deployment/runtime to come online, then request a new pairing code.' });
+            try { fs.rmSync(loggedOutMarker, { force: true }); } catch (_) {}
+            res.json({ error: 'Old logged-out session backed up and reset safely. Bot is restarting; wait about 15 seconds, refresh this page, and request the pairing code again.' });
             setTimeout(() => process.exit(0), 1200);
             return;
         }
@@ -645,7 +649,16 @@ async function connectToWhatsApp() {
         if (connection === 'close') {
             const statusCode = lastDisconnect?.error?.output?.statusCode;
             const shouldReconnect = statusCode !== DisconnectReason.loggedOut;
-            if (!shouldReconnect) waLoggedOut = true;
+            if (!shouldReconnect) {
+                waLoggedOut = true;
+                try {
+                    const authDir = await getPersistentAuthDir();
+                    fs.writeFileSync(path.join(path.dirname(authDir), 'wa-logged-out.flag'), String(Date.now()));
+                    console.log('⚠️ Logged-out marker saved. Session preserved until explicit re-pair request.');
+                } catch (markerErr) {
+                    console.error('Could not save logged-out marker:', markerErr.message);
+                }
+            }
             console.log('⚠️ Connection closed. Status:', statusCode, 'Reconnecting:', shouldReconnect);
             if (shouldReconnect && !reconnectTimer) {
                 reconnectTimer = setTimeout(() => {
