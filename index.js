@@ -528,8 +528,27 @@ app.listen(PORT, () => {
    ⚙️ BOT SETTINGS
    ============================================================ */
 const startTime = Date.now();
-let isAlwaysOnline = false;
+let isAlwaysOnline = String(process.env.ALWAYS_ONLINE || 'false').toLowerCase() === 'true';
 let isAutoStatusView = true;
+
+// Refresh WhatsApp presence periodically while Always Online is enabled.
+let presenceHeartbeat = null;
+function syncAlwaysOnlineHeartbeat() {
+    if (presenceHeartbeat) {
+        clearInterval(presenceHeartbeat);
+        presenceHeartbeat = null;
+    }
+    if (isAlwaysOnline) {
+        presenceHeartbeat = setInterval(async () => {
+            try {
+                if (sock?.user) await sock.sendPresenceUpdate('available');
+            } catch (err) {
+                console.error('Always-online heartbeat error:', err.message);
+            }
+        }, 25000);
+        presenceHeartbeat.unref?.();
+    }
+}
 let isAutoReact = true;
 let isAutoDL = true;
 let PREFIX = '.';
@@ -717,11 +736,15 @@ async function connectToWhatsApp() {
             else if (command === 'alwaysonline' || command === 'autoonline') {
                 if (args.toLowerCase() === 'on') {
                     isAlwaysOnline = true;
-                    await sock.sendPresenceUpdate('available', from);
+                    syncAlwaysOnlineHeartbeat();
+                    try { await sock.sendPresenceUpdate('available'); } catch (e) {}
+                    try { await sock.sendPresenceUpdate('available', from); } catch (e) {}
                     await sock.sendMessage(from, { text: '🟢 *Always Online Status is now ACTIVATED!*' }, { quoted: msg });
                 } else if (args.toLowerCase() === 'off') {
                     isAlwaysOnline = false;
-                    await sock.sendPresenceUpdate('unavailable', from);
+                    syncAlwaysOnlineHeartbeat();
+                    try { await sock.sendPresenceUpdate('unavailable'); } catch (e) {}
+                    try { await sock.sendPresenceUpdate('unavailable', from); } catch (e) {}
                     await sock.sendMessage(from, { text: '🔴 *Always Online Status is now DEACTIVATED!*' }, { quoted: msg });
                 } else {
                     await sock.sendMessage(from, { 
