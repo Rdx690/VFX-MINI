@@ -879,7 +879,7 @@ async function connectToWhatsApp() {
                 }
             }
             else if (command === 'insta' || command === 'instagram') {
-                if (!args || !/instagram\\.com\\//i.test(args)) return await sock.sendMessage(from, { text: `❌ Instagram URL taka! e.g. \`${PREFIX}insta https://www.instagram.com/reel/URL\`` }, { quoted: msg });
+                if (!args || !/instagram\.com\//i.test(args)) return await sock.sendMessage(from, { text: `❌ Instagram URL taka! e.g. \`${PREFIX}insta https://www.instagram.com/reel/URL\`` }, { quoted: msg });
                 await sock.sendMessage(from, { text: '📥 *Downloading Instagram media...*' }, { quoted: msg });
                 try {
                     const api = `https://api.sayan-nexuswork.workers.dev/insta?url=${encodeURIComponent(args.trim())}`;
@@ -887,7 +887,7 @@ async function connectToWhatsApp() {
                     const data = res.data;
                     const mediaUrl = data?.url || data?.urls?.[0];
                     if (data?.status !== 'success' || !mediaUrl) return await sock.sendMessage(from, { text: '❌ Instagram media unavailable or API failed.' }, { quoted: msg });
-                    if (data.type === 'image' || /\\.jpe?g(\\?|$)/i.test(mediaUrl) || /\\.png(\\?|$)/i.test(mediaUrl)) {
+                    if (data.type === 'image' || /\.jpe?g(\?|$)/i.test(mediaUrl) || /\.png(\?|$)/i.test(mediaUrl)) {
                         await sock.sendMessage(from, { image: { url: mediaUrl }, caption: '📸 *VFX MINI Instagram Downloader*' }, { quoted: msg });
                     } else {
                         await sock.sendMessage(from, { video: { url: mediaUrl }, caption: '📸 *VFX MINI Instagram Downloader*' }, { quoted: msg });
