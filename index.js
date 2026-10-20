@@ -778,54 +778,48 @@ async function connectToWhatsApp() {
                 }, { quoted: msg });
             }
             else if (command === 'menu' || command === 'help') {
-                const menuText = 
-`┌───⟨ 🎬 *VFX MINI* ⟩───
-│
-├ 👨‍💻 *Devs:* SOURAJITVFX & RAHUL AI
-├ ⚡ *Status:* Active & Fast
-├ 📌 *Prefix:* [ \`${PREFIX}\` ]
-├ 🟢 *Always Online:* ${isAlwaysOnline ? 'ON' : 'OFF'}
-├ 👀 *Auto Status View:* ${isAutoStatusView ? 'ON' : 'OFF'}
-├ ❤️ *Auto React:* ${isAutoReact ? 'ON' : 'OFF'}
-├ 📥 *Auto DL:* ${isAutoDL ? 'ON' : 'OFF'}
-│
-├───⟨ ⚙️ *BOT CONTROL & SETTINGS* ⟩───
-│
-├ 🔹 \`${PREFIX}update\` - Auto Update Bot
-├ 🔹 \`${PREFIX}alwaysonline on/off\`
-├ 🔹 \`${PREFIX}statusview on/off\`
-├ 🔹 \`${PREFIX}autoreact on/off\`
-├ 🔹 \`${PREFIX}autodl on/off\`
-├ 🔹 \`${PREFIX}setprefix <symbol>\`
-├ 🔹 \`${PREFIX}ping\` - Speed Test
-├ 🔹 \`${PREFIX}uptime\` - Online Time
-│
-├───⟨ 📥 *STATUS & DOWNLOADS* ⟩───
-│
-├ 🔹 Reply *'send'* on any Status to get Video/Image
-├ 🔹 \`${PREFIX}play <song name>\` - Download/Play Song
-├ 🔹 \`${PREFIX}mp3 <song name>\` - MP3 Audio
-├ 🔹 \`${PREFIX}video <query>\` - Download YouTube Video
-├ 🔹 \`${PREFIX}insta <Instagram URL>\` - Download Instagram Media
-├ 🔹 \`${PREFIX}tourl\` - Media to Link Uploader
-├ 🔹 \`${PREFIX}sticker\` / \`${PREFIX}s\` - Photo to Sticker
-│
-├───⟨ 🛠️ *SMART TOOLS* ⟩───
-│
-├ 🔹 \`${PREFIX}ai <text>\` - Ask AI
-├ 🔹 \`${PREFIX}google <query>\` - Search Google
-├ 🔹 \`${PREFIX}weather <city>\` - Weather Report
-├ 🔹 \`${PREFIX}qr <text>\` - Generate QR Code
-├ 🔹 \`${PREFIX}calc <math>\` - Math Calculator
-├ 🔹 \`${PREFIX}quote\` - Get Daily Quote
-│
-├───⟨ 👥 *GROUP TOOLS* ⟩───
-│
-├ 🔹 \`${PREFIX}tagall\` - Tag all members
-├ 🔹 \`${PREFIX}mute\` - Mute Group Chat
-├ 🔹 \`${PREFIX}unmute\` - Unmute Group Chat
-│
-└───⟨ ⚙️ *POWERED BY VFX MINI* ⟩───`;
+                const menuText =
+`╭━━〔 ⚡ *LEVENTER × VFX MINI* 〕━━╮
+┃
+┃ 👑 *OWNER:* SOURАJIT VFX
+┃ 🧩 *BOT:* VFX-MINI
+┃ ⚙️ *AUTO-DL:* ${isAutoDL ? 'ON' : 'OFF'}
+┃ 🟢 *STATUS:* ${sock?.user ? 'CONNECTED' : 'STARTING'}
+┃ 🔣 *PREFIX:* [ \`${PREFIX}\` ]
+┃
+┣━━〔 🎛️ *SYSTEM SETTINGS* 〕━━
+┃ • \`${PREFIX}ping\` — Check response speed
+┃ • \`${PREFIX}uptime\` — Bot uptime
+┃ • \`${PREFIX}setprefix <symbol>\` — Change prefix
+┃ • \`${PREFIX}alwaysonline on/off\`
+┃ • \`${PREFIX}statusview on/off\`
+┃ • \`${PREFIX}autoreact on/off\`
+┃ • \`${PREFIX}autodl on/off\`
+┃ • \`${PREFIX}update\` — Update bot
+┃
+┣━━〔 🎧 *MUSIC & VIDEO* 〕━━
+┃ • \`${PREFIX}play <song name>\` — MP3 music
+┃ • \`${PREFIX}mp3 <song name>\` — Download audio
+┃ • \`${PREFIX}video <query>\` — Download video
+┃ • \`${PREFIX}insta <Instagram URL>\` — Instagram media
+┃ • Send a supported public link for AutoDL
+┃
+┣━━〔 🧰 *SMART TOOLS* 〕━━
+┃ • \`${PREFIX}ai <text>\` — Ask AI
+┃ • \`${PREFIX}google <query>\` — Google search
+┃ • \`${PREFIX}weather <city>\` — Weather report
+┃ • \`${PREFIX}qr <text>\` — Create QR code
+┃ • \`${PREFIX}calc <math>\` — Calculator
+┃ • \`${PREFIX}quote\` — Daily quote
+┃ • \`${PREFIX}tourl\` — Media to link
+┃ • \`${PREFIX}sticker\` / \`${PREFIX}s\` — Create sticker
+┃
+┣━━〔 👥 *GROUP COMMANDS* 〕━━
+┃ • \`${PREFIX}tagall\` — Tag group members
+┃ • \`${PREFIX}mute\` — Mute group
+┃ • \`${PREFIX}unmute\` — Unmute group
+┃
+╰━━〔 ✨ *POWERED BY SOURАJIT VFX* 〕━━╯`;
                 await sock.sendMessage(from, { text: menuText }, { quoted: msg });
             }
             else if (command === 'play' || command === 'song') {
