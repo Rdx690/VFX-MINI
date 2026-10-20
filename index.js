@@ -865,6 +865,7 @@ async function connectToWhatsApp() {
  │ ${PREFIX}GOOGLE <query>
  │ ${PREFIX}WEATHER <city>
  │ ${PREFIX}QUOTE
+ │ ${PREFIX}FANCY <text>
 ╰─────────────────
 ╭─❏ ᴅᴏᴡɴʟᴏᴀᴅ ❏
  │ ${PREFIX}PLAY <song>
@@ -900,6 +901,29 @@ async function connectToWhatsApp() {
 ╰─────────────────
 ╰━━〔 ᴘᴏᴡᴇʀᴇᴅ ʙʏ SOURАJIT VFX 〕━━╯`;
                 await sock.sendMessage(from, { text: menuText }, { quoted: msg });
+            }
+            else if (command === 'fancy' || command === 'font' || command === 'fonts') {
+                if (!args.trim()) {
+                    return await sock.sendMessage(from, {
+                        text: `✨ *VFX MINI FANCY TEXT*\n\nUse: ` + "`${PREFIX}fancy Your Text`" + `\nExample: ` + "`${PREFIX}fancy SOURAJIT VFX`" + `
+                    }, { quoted: msg });
+                }
+                try {
+                    const apiUrl = `https://eliteprotech-apis.zone.id/fun/font?text=${encodeURIComponent(args.trim())}`;
+                    const response = await axios.get(apiUrl, { timeout: 20000 });
+                    const styles = response.data?.results;
+                    if (response.data?.status !== true || !Array.isArray(styles) || !styles.length) {
+                        throw new Error('No font styles returned');
+                    }
+                    const lines = styles.slice(0, 35).map((item, index) =>
+                        `${index + 1}. *${String(item.name || 'Font').replace(/([_*~])/g, '\\$1')}*\n${item.text || ''}`
+                    );
+                    const output = `✨ *VFX MINI FANCY TEXT* ✨\n\n📝 *Input:* ${args.trim()}\n\n${lines.join('\n\n')}\n\n⚡ Powered by VFX MINI`;
+                    await sock.sendMessage(from, { text: output.slice(0, 60000) }, { quoted: msg });
+                } catch (error) {
+                    console.error('Fancy font API error:', error.message);
+                    await sock.sendMessage(from, { text: '❌ Fancy font API abhi response nahi de rahi. Thodi der baad try karo.' }, { quoted: msg });
+                }
             }
             else if (command === 'play' || command === 'song') {
                 if (!args) return await sock.sendMessage(from, { text: `❌ Song name taka! e.g. \`${PREFIX}play Blinding Lights\`` }, { quoted: msg });
