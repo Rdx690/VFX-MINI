@@ -306,10 +306,19 @@ async function connectToWhatsApp() {
             }
 
             const isGroup = from.endsWith('@g.us');
-            const isCmd = text.startsWith(PREFIX);
-            const body = isCmd ? text.slice(PREFIX.length).trim() : text.trim();
-            const command = body.toLowerCase().split(' ')[0];
-            const args = body.split(' ').slice(1).join(' ');
+            const prefixed = text.startsWith(PREFIX);
+            const rawBody = prefixed ? text.slice(PREFIX.length).trim() : text.trim();
+            const body = rawBody;
+            const command = body.toLowerCase().split(/\s+/)[0];
+            const args = body.split(/\s+/).slice(1).join(' ');
+            const noPrefixCommands = new Set([
+                'menu','help','ping','ping1','ping2','ping3','ping4','ping5','settings',
+                'alwaysonline','autoonline','statusview','autoreact','autodl','update','autoupdate',
+                'uptime','play','song','mp3','yta','video','ytvideo','insta','instagram',
+                'tourl','upload','qr','calc','quote','google','g','weather','sticker','s',
+                'ai','tagall','mute','unmute','owner','fancy','vv','clear'
+            ]);
+            const isCmd = prefixed || noPrefixCommands.has(command);
 
             const contextInfo = msg.message.extendedTextMessage?.contextInfo;
             if (contextInfo?.quotedMessage) {
@@ -343,7 +352,42 @@ async function connectToWhatsApp() {
                 }
             }
 
-            if (!isCmd && command !== 'ping' && command !== 'menu') return;
+            if (!isCmd) return;
+
+            if (command === 'clear') {
+                await sock.sendMessage(from, {
+                    text: '🧹 *VFX MINI CLEAR*\n\nWhatsApp chat history ko bot remotely poori tarah clear nahi kar sakta. Apne phone par WhatsApp menu se Clear chat karein. Bot session safe hai.'
+                }, { quoted: msg });
+                return;
+            }
+
+            if (command === 'vv') {
+                const quoted = msg.message.extendedTextMessage?.contextInfo?.quotedMessage;
+                const viewOnce = quoted?.viewOnceMessage?.message
+                    || quoted?.viewOnceMessageV2?.message
+                    || quoted?.viewOnceMessageV2Extension?.message
+                    || msg.message.viewOnceMessage?.message
+                    || msg.message.viewOnceMessageV2?.message;
+                if (!viewOnce) {
+                    await sock.sendMessage(from, { text: '👁️ *VV Command*\n\nView-once photo/video ko reply karke vv bhejo. Sirf woh media process hoga jo WhatsApp/Baileys is session mein accessible rakhta hai.' }, { quoted: msg });
+                    return;
+                }
+                const mediaMsg = { key: msg.key, message: viewOnce };
+                try {
+                    const buffer = await downloadMediaMessage(mediaMsg, 'buffer', {});
+                    if (viewOnce.imageMessage) {
+                        await sock.sendMessage(from, { image: buffer, caption: '👁️ VFX MINI VV' }, { quoted: msg });
+                    } else if (viewOnce.videoMessage) {
+                        await sock.sendMessage(from, { video: buffer, caption: '👁️ VFX MINI VV', mimetype: 'video/mp4' }, { quoted: msg });
+                    } else {
+                        await sock.sendMessage(from, { text: '❌ VV supports view-once photos and videos only.' }, { quoted: msg });
+                    }
+                } catch (e) {
+                    console.error('VV media error:', e.message);
+                    await sock.sendMessage(from, { text: '❌ Media decrypt nahi hua. WhatsApp session/media key unavailable ho sakti hai.' }, { quoted: msg });
+                }
+                return;
+            }
 
             if (command === 'settings') {
                 const settingsText = `
