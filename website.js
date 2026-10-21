@@ -506,7 +506,7 @@ app.get('/', (req, res) => {
         </div>
 
         <div class="music-note" id="musicNote">VFX MINI • MUSIC READY</div>
-        <audio id="phonkAudio" preload="none" loop playsinline>
+        <audio id="phonkAudio" autoplay preload="auto" loop playsinline>
             <source src="https://www.image2url.com/r2/default/audio/1792553400781-eed61433-8ccd-4ef1-9492-ada715b288c9.mp3" type="audio/mpeg">
         </audio>
         <button class="music-toggle" id="musicToggle" type="button" onclick="togglePhonk()" aria-pressed="false">
@@ -617,6 +617,40 @@ app.get('/', (req, res) => {
                     console.error('Music playback failed:', err);
                 }
             }
+
+            // Try autoplay on page load. Browsers may block audible autoplay until a user gesture.
+            (function setupMusicAutoplay() {
+                const audio = document.getElementById('phonkAudio');
+                const button = document.getElementById('musicToggle');
+                const label = document.getElementById('musicToggleText');
+                const note = document.getElementById('musicNote');
+                if (!audio) return;
+                audio.autoplay = true;
+                audio.loop = true;
+                audio.preload = 'auto';
+                const syncPlayingUI = () => {
+                    if (button) { button.classList.add('playing'); button.setAttribute('aria-pressed', 'true'); }
+                    if (label) label.textContent = 'STOP MUSIC';
+                    if (note) note.textContent = 'VFX MINI • MUSIC PLAYING';
+                };
+                const tryAutoplay = () => audio.play().then(syncPlayingUI).catch(() => {
+                    if (note) note.textContent = 'Tap anywhere or PLAY MUSIC to start audio';
+                });
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', tryAutoplay, { once: true });
+                } else {
+                    tryAutoplay();
+                }
+                const resumeAfterGesture = () => {
+                    if (audio.paused) tryAutoplay();
+                    if (!audio.paused) {
+                        document.removeEventListener('pointerdown', resumeAfterGesture);
+                        document.removeEventListener('keydown', resumeAfterGesture);
+                    }
+                };
+                document.addEventListener('pointerdown', resumeAfterGesture, { passive: true });
+                document.addEventListener('keydown', resumeAfterGesture);
+            })();
 
             // ---------- Pairing Logic (same-to-same) ----------
             async function getPairingCode() {
