@@ -909,24 +909,27 @@ ${PREFIX}autodl on/off
                     text: '🔗 *VFX MINI PAIRING PORTAL*\n\nOpen the pairing page only if WhatsApp is actually disconnected:\nhttps://vfx-mini-production.up.railway.app\n\n⚠️ This command does not relink an already-connected session. If this bot is online, do not pair again. Keep your existing session safe.'
                 }, { quoted: msg });
             }
-            else if (command === 'ping' || command === 'ping2') {
-                const start = Date.now();
-                const animated = command === 'ping2';
-                if (animated) {
-                    const frames = ['⏳ *VFX MINI*  ▰▱▱▱▱', '⚡ *VFX MINI*  ▰▰▱▱▱', '🚀 *VFX MINI*  ▰▰▰▱▱', '✨ *VFX MINI*  ▰▰▰▰▱'];
-                    for (const frame of frames) {
-                        await sock.sendMessage(from, { text: frame }, { quoted: msg });
-                        await delay(250);
-                    }
-                } else {
-                    await sock.sendMessage(from, { text: '🚀 Speed testing...' }, { quoted: msg });
-                }
-                const latency = Date.now() - start;
+            else if (['ping', 'ping1', 'ping2', 'ping3', 'ping4', 'ping5'].includes(command)) {
+                const startedAt = Date.now();
                 const uptimeSeconds = Math.floor(process.uptime());
                 const uptime = `${Math.floor(uptimeSeconds / 3600)}h ${Math.floor((uptimeSeconds % 3600) / 60)}m ${uptimeSeconds % 60}s`;
-                await sock.sendMessage(from, {
-                    text: `╭━━━ ⚡ *VFX MINI PING* ⚡ ━━━╮\n┃ 🚀 *Status:* Online\n┃ ⏱️ *Latency:* ${latency} ms\n┃ 🕒 *Uptime:* ${uptime}\n┃ 💾 *RAM:* ${Math.round(process.memoryUsage().rss / 1024 / 1024)} MB\n╰━━━━━━━━━━━━━━━━━━━━━━╯\n✨ Powered by SOURAJITVFX`
-                }, { quoted: msg });
+                const latency = Math.max(0, Date.now() - (msg.messageTimestamp ? Number(msg.messageTimestamp) * 1000 : startedAt));
+                const ram = Math.round(process.memoryUsage().rss / 1024 / 1024);
+                const styles = {
+                    ping: `⚡ *VFX MINI SPEED* ⚡\n\n⏱️ Latency: ${latency} ms\n🟢 Status: Active & Online\n✨ SOURAJITVFX`,
+                    ping1: `╭━━ ⚡ *VFX MINI • PING 01* ⚡ ━━╮\n┃ 🟢 Status: ONLINE\n┃ ⏱️ Reply: ${latency} ms\n┃ 🕒 Uptime: ${uptime}\n╰━━━━━━━━━━━━━━━━━━╯`,
+                    ping2: `╭━━ 🚀 *VFX MINI • PING 02* 🚀 ━━╮\n┃ ▰▰▰▰▰ 100%\n┃ ⚡ Latency: ${latency} ms\n┃ 💾 RAM: ${ram} MB\n╰━━━━━━━━━━━━━━━━━━╯`,
+                    ping3: `┏━━━ ✦ *SPEED CHECK* ✦ ━━━┓\n  ◉ ONLINE  •  ${latency} ms\n  ◉ UPTIME  •  ${uptime}\n  ◉ MEMORY  •  ${ram} MB\n┗━━━━━━━━━━━━━━━━━━━┛`,
+                    ping4: `⚡━━━━━━━━ *VFX MINI* ━━━━━━━━⚡\n\n🚦 SYSTEM: READY\n📡 RESPONSE: ${latency} ms\n⏳ UPTIME: ${uptime}\n💾 RAM: ${ram} MB\n\n⚡ POWERED BY SOURAJITVFX`,
+                    ping5: `╔═══════ ✨ *VFX MINI* ✨ ═══════╗\n║ Status  : 🟢 Online\n║ Latency : ${latency} ms\n║ Uptime  : ${uptime}\n║ RAM     : ${ram} MB\n╚════════════════════════════╝`
+                };
+                if (command === 'ping2') {
+                    for (const frame of ['⏳ *Checking connection…*', '⚡ *Measuring response…*', '🚀 *VFX MINI ONLINE*']) {
+                        await sock.sendMessage(from, { text: frame }, { quoted: msg });
+                        await delay(180);
+                    }
+                }
+                await sock.sendMessage(from, { text: styles[command] }, { quoted: msg });
             }
             else if (command === 'menu' || command === 'help') {
                 const now = new Date();
@@ -966,7 +969,7 @@ ${PREFIX}autodl on/off
                     '╰━━━━━━━━━━━━━━━━━━━━━━╯',
                     '',
                     '╭━━〔 🧰 ᴛᴏᴏʟs 🧰 〕━━╮',
-                    '┃ ◈ ' + PREFIX + 'ping',
+                    '┃ ◈ ' + PREFIX + 'ping / ping1 / ping2 / ping3 / ping4 / ping5',
                     '┃ ◈ ' + PREFIX + 'pair (pairing portal)',
                     '┃ ◈ ' + PREFIX + 'uptime',
                     '┃ ◈ ' + PREFIX + 'calc <math>',
