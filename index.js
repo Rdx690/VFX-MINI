@@ -529,9 +529,12 @@ app.get('/', (req, res) => {
             </div>
         </div>
 
-        <div class="music-note" id="musicNote">PHONK BEAT • TAP TO PLAY</div>
+        <div class="music-note" id="musicNote">VFX MINI • MUSIC READY</div>
+        <audio id="phonkAudio" preload="none" loop playsinline>
+            <source src="https://www.image2url.com/r2/default/audio/1792553400781-eed61433-8ccd-4ef1-9492-ada715b288c9.mp3" type="audio/mpeg">
+        </audio>
         <button class="music-toggle" id="musicToggle" type="button" onclick="togglePhonk()" aria-pressed="false">
-            <i class="fa-solid fa-music"></i><span id="musicToggleText">PLAY PHONK</span>
+            <i class="fa-solid fa-music"></i><span id="musicToggleText">PLAY MUSIC</span>
         </button>
 
         <!-- ============ FOOTER ============ -->
@@ -609,73 +612,33 @@ app.get('/', (req, res) => {
                 }
             }
 
-            // ---------- Built-in phonk-style beat (generated locally; no external audio file) ----------
-            let phonkCtx = null, phonkTimer = null, phonkStep = 0, phonkPlaying = false;
-            function phonkKick(time, accent) {
-                const osc = phonkCtx.createOscillator(), gain = phonkCtx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(135, time);
-                osc.frequency.exponentialRampToValueAtTime(42, time + 0.14);
-                gain.gain.setValueAtTime(accent ? 0.65 : 0.4, time);
-                gain.gain.exponentialRampToValueAtTime(0.001, time + 0.18);
-                osc.connect(gain); gain.connect(phonkCtx.destination);
-                osc.start(time); osc.stop(time + 0.19);
-            }
-            function phonkCowbell(time, freq) {
-                const osc = phonkCtx.createOscillator(), gain = phonkCtx.createGain();
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(freq, time);
-                gain.gain.setValueAtTime(0.0001, time);
-                gain.gain.exponentialRampToValueAtTime(0.075, time + 0.008);
-                gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.11);
-                const filter = phonkCtx.createBiquadFilter();
-                filter.type = 'lowpass'; filter.frequency.value = 2600;
-                osc.connect(filter); filter.connect(gain); gain.connect(phonkCtx.destination);
-                osc.start(time); osc.stop(time + 0.12);
-            }
-            function phonkHat(time) {
-                const bufferSize = Math.floor(phonkCtx.sampleRate * 0.035);
-                const buffer = phonkCtx.createBuffer(1, bufferSize, phonkCtx.sampleRate);
-                const data = buffer.getChannelData(0);
-                for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
-                const src = phonkCtx.createBufferSource(), filter = phonkCtx.createBiquadFilter(), gain = phonkCtx.createGain();
-                src.buffer = buffer; filter.type = 'highpass'; filter.frequency.value = 7000;
-                gain.gain.setValueAtTime(0.07, time); gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.035);
-                src.connect(filter); filter.connect(gain); gain.connect(phonkCtx.destination);
-                src.start(time);
-            }
-            function phonkTick() {
-                if (!phonkCtx || phonkCtx.state !== 'running') return;
-                const step = phonkStep % 16, time = phonkCtx.currentTime + 0.015;
-                if ([0, 6, 8, 14].includes(step)) phonkKick(time, step === 0 || step === 8);
-                if ([4, 12].includes(step)) phonkKick(time, false);
-                if ([2, 6, 10, 14].includes(step)) phonkCowbell(time, [620, 740, 830, 740][(step / 2) % 4]);
-                if (step % 2 === 0) phonkHat(time);
-                phonkStep++;
-            }
+            // ---------- User-provided phonk music ----------
+            const phonkAudio = document.getElementById('phonkAudio');
+            let phonkPlaying = false;
             async function togglePhonk() {
                 const button = document.getElementById('musicToggle');
                 const label = document.getElementById('musicToggleText');
                 const note = document.getElementById('musicNote');
+                if (!phonkAudio || !button || !label || !note) return;
                 try {
                     if (phonkPlaying) {
-                        if (phonkTimer) clearInterval(phonkTimer);
-                        phonkTimer = null; phonkPlaying = false;
-                        if (phonkCtx) await phonkCtx.suspend();
-                        button.classList.remove('playing'); button.setAttribute('aria-pressed', 'false');
-                        label.textContent = 'PLAY PHONK'; note.textContent = 'PHONK BEAT PAUSED';
+                        phonkAudio.pause();
+                        phonkPlaying = false;
+                        button.classList.remove('playing');
+                        button.setAttribute('aria-pressed', 'false');
+                        label.textContent = 'PLAY MUSIC';
+                        note.textContent = 'MUSIC PAUSED';
                         return;
                     }
-                    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-                    if (!AudioContextClass) throw new Error('Audio is not supported by this browser');
-                    if (!phonkCtx) phonkCtx = new AudioContextClass();
-                    await phonkCtx.resume();
-                    phonkPlaying = true; phonkStep = 0;
-                    phonkTick(); phonkTimer = setInterval(phonkTick, 125);
-                    button.classList.add('playing'); button.setAttribute('aria-pressed', 'true');
-                    label.textContent = 'STOP PHONK'; note.textContent = 'VFX MINI • PHONK PLAYING';
+                    await phonkAudio.play();
+                    phonkPlaying = true;
+                    button.classList.add('playing');
+                    button.setAttribute('aria-pressed', 'true');
+                    label.textContent = 'STOP MUSIC';
+                    note.textContent = 'VFX MINI • MUSIC PLAYING';
                 } catch (err) {
-                    note.textContent = err.message || 'Audio unavailable';
+                    note.textContent = 'Tap PLAY MUSIC again or check audio link';
+                    console.error('Music playback failed:', err);
                 }
             }
 
