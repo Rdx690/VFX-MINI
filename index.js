@@ -386,9 +386,75 @@ app.get('/', (req, res) => {
                 .brand-text small{display:none;}
                 .logo-badge span{font-size:15px;letter-spacing:2px;}
             }
+
+            /* ============ VFX MINI OPENING SPLASH ============ */
+            .opening-splash{
+                position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;
+                align-items:center;justify-content:center;gap:24px;overflow:hidden;
+                background:#020308;color:#fff;opacity:1;visibility:visible;
+                transition:opacity .75s ease,visibility .75s ease;
+            }
+            .opening-splash::before{
+                content:'';position:absolute;inset:0;pointer-events:none;
+                background-image:linear-gradient(rgba(0,229,255,.045) 1px,transparent 1px),
+                    linear-gradient(90deg,rgba(0,229,255,.045) 1px,transparent 1px);
+                background-size:48px 48px;mask-image:radial-gradient(circle,black 20%,transparent 85%);
+                animation:splashGrid 12s linear infinite;
+            }
+            .opening-splash::after{
+                content:'';position:absolute;width:min(78vw,360px);aspect-ratio:1;border-radius:50%;
+                background:radial-gradient(circle,rgba(0,229,255,.17),rgba(168,85,247,.08) 45%,transparent 70%);
+                filter:blur(8px);animation:splashAura 2.4s ease-in-out infinite;
+            }
+            .opening-splash.hide{opacity:0;visibility:hidden;pointer-events:none}
+            .splash-orbit{
+                position:relative;z-index:1;width:min(58vw,230px);aspect-ratio:1;border-radius:50%;
+                display:grid;place-items:center;border:2px solid rgba(0,229,255,.65);
+                box-shadow:0 0 22px rgba(0,229,255,.35),inset 0 0 25px rgba(168,85,247,.16);
+                animation:orbitPulse 2s ease-in-out infinite;
+            }
+            .splash-orbit::before,.splash-orbit::after{
+                content:'';position:absolute;inset:-13px;border-radius:50%;
+                border:1px dashed rgba(168,85,247,.9);animation:orbitSpin 8s linear infinite;
+            }
+            .splash-orbit::after{inset:-24px;border:3px solid transparent;border-top-color:#00e5ff;border-bottom-color:#ff2e88;animation:orbitSpin 3s linear infinite}
+            .splash-logo{
+                width:76%;height:76%;object-fit:contain;border-radius:50%;position:relative;z-index:2;
+                filter:drop-shadow(0 0 12px rgba(0,229,255,.55));
+                animation:splashLogoIn .9s cubic-bezier(.2,.9,.3,1.2) both;
+            }
+            .splash-title{
+                position:relative;z-index:1;font-family:'Orbitron',sans-serif;font-weight:900;
+                font-size:clamp(30px,8vw,54px);letter-spacing:clamp(3px,1.5vw,8px);
+                text-align:center;text-shadow:0 0 24px rgba(0,229,255,.4);
+                animation:splashTitleIn .8s .2s both;
+            }
+            .splash-title span{color:var(--primary);text-shadow:0 0 18px rgba(0,229,255,.7)}
+            .splash-credit{position:relative;z-index:1;color:#9ba8bb;font-size:11px;letter-spacing:4px;text-align:center;animation:splashTitleIn .8s .4s both}
+            .splash-loader{position:relative;z-index:1;width:130px;height:3px;border-radius:10px;background:#17202b;overflow:hidden}
+            .splash-loader span{display:block;width:45%;height:100%;border-radius:10px;background:linear-gradient(90deg,var(--primary),var(--secondary),var(--accent));box-shadow:0 0 12px var(--primary);animation:splashLoad 1.35s ease-in-out infinite}
+            @keyframes orbitSpin{to{transform:rotate(360deg)}}
+            @keyframes orbitPulse{0%,100%{box-shadow:0 0 22px rgba(0,229,255,.35),inset 0 0 25px rgba(168,85,247,.16)}50%{box-shadow:0 0 42px rgba(168,85,247,.55),inset 0 0 35px rgba(0,229,255,.2)}}
+            @keyframes splashAura{0%,100%{transform:scale(.88);opacity:.6}50%{transform:scale(1.08);opacity:1}}
+            @keyframes splashLogoIn{from{opacity:0;transform:scale(.72) rotate(-8deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+            @keyframes splashTitleIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+            @keyframes splashLoad{0%{transform:translateX(-120%)}100%{transform:translateX(340%)}}
+            @keyframes splashGrid{to{background-position:48px 48px}}
+            @media(prefers-reduced-motion:reduce){
+                .opening-splash *,.opening-splash::before,.opening-splash::after{animation:none!important}
+            }
+
         </style>
     </head>
     <body>
+        <div class="opening-splash" id="openingSplash" aria-label="VFX MINI loading">
+            <div class="splash-orbit">
+                <img class="splash-logo" src="/brand-logo" alt="VFX MINI logo" onerror="this.onerror=null;this.src='https://ibb.co/HL6Ftn8P';">
+            </div>
+            <div class="splash-title">VFX <span>MINI</span></div>
+            <div class="splash-credit">POWERED BY SOURAJITVFX</div>
+            <div class="splash-loader" aria-hidden="true"><span></span></div>
+        </div>
 
         <!-- Floating Particles -->
         <div class="particles" id="particles"></div>
@@ -512,6 +578,23 @@ app.get('/', (req, res) => {
                 btn.innerHTML = originalHTML;
                 btn.disabled = false;
             }
+        </script>
+        <script>
+            (function () {
+                const splash = document.getElementById('openingSplash');
+                if (!splash) return;
+                let alreadyShown = false;
+                try { alreadyShown = sessionStorage.getItem('vfxMiniSplashShown') === '1'; } catch (_) {}
+                if (alreadyShown) {
+                    splash.remove();
+                    return;
+                }
+                try { sessionStorage.setItem('vfxMiniSplashShown', '1'); } catch (_) {}
+                window.setTimeout(() => {
+                    splash.classList.add('hide');
+                    window.setTimeout(() => splash.remove(), 800);
+                }, 3000);
+            })();
         </script>
     </body>
     </html>
