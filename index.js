@@ -387,6 +387,24 @@ app.get('/', (req, res) => {
                 .logo-badge span{font-size:15px;letter-spacing:2px;}
             }
 
+            .copy-code-btn{
+                margin-top:14px;padding:11px 16px;border-radius:10px;border:1px solid rgba(0,229,255,.55);
+                color:var(--primary);background:rgba(0,229,255,.09);font-weight:700;letter-spacing:1px;
+                cursor:pointer;box-shadow:0 0 14px rgba(0,229,255,.12);transition:all .2s ease
+            }
+            .copy-code-btn:active{transform:scale(.97)}
+            .copy-hint{font-size:11px;color:var(--muted);margin-top:10px}
+            .music-toggle{
+                position:fixed;right:16px;bottom:18px;z-index:200;display:flex;align-items:center;gap:9px;
+                border:1px solid rgba(0,229,255,.5);border-radius:999px;padding:12px 16px;
+                color:#fff;background:rgba(7,10,20,.88);backdrop-filter:blur(14px);
+                box-shadow:0 0 20px rgba(0,229,255,.18);font-weight:700;cursor:pointer
+            }
+            .music-toggle i{color:var(--primary)}
+            .music-toggle.playing{border-color:rgba(255,46,136,.75);box-shadow:0 0 24px rgba(255,46,136,.25)}
+            .music-toggle.playing i{color:#ff2e88}
+            .music-note{position:fixed;right:18px;bottom:76px;z-index:199;color:#9ba8bb;font-size:10px;letter-spacing:1px}
+
             /* ============ VFX MINI OPENING SPLASH ============ */
             .opening-splash{
                 position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;
@@ -498,8 +516,10 @@ app.get('/', (req, res) => {
                 </button>
 
                 <div id="codeContainer" class="code-box">
-                    <div class="label">Your Pairing Code</div>
-                    <h2 id="pairCode">-----</h2>
+                    <div class="label">Your Linked Device Code</div>
+                    <h2 id="pairCode" title="Tap to copy" role="button" tabindex="0" onclick="copyPairCode()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();copyPairCode();}">-----</h2>
+                    <button type="button" class="copy-code-btn" id="copyCodeBtn" onclick="copyPairCode()"><i class="fa-regular fa-copy"></i> TAP TO COPY CODE</button>
+                    <p class="copy-hint" id="copyHint">Tap the code or button to copy it</p>
                 </div>
 
                 <div class="dev-credits">
@@ -508,6 +528,11 @@ app.get('/', (req, res) => {
                 </div>
             </div>
         </div>
+
+        <div class="music-note" id="musicNote">PHONK BEAT • TAP TO PLAY</div>
+        <button class="music-toggle" id="musicToggle" type="button" onclick="togglePhonk()" aria-pressed="false">
+            <i class="fa-solid fa-music"></i><span id="musicToggleText">PLAY PHONK</span>
+        </button>
 
         <!-- ============ FOOTER ============ -->
         <footer class="site-footer">
@@ -553,6 +578,106 @@ app.get('/', (req, res) => {
             card.addEventListener('mouseleave', () => {
                 card.style.transform = 'rotateY(0) rotateX(0)';
             });
+
+            // ---------- Pairing code tap-to-copy ----------
+            async function copyPairCode() {
+                const code = (document.getElementById('pairCode').innerText || '').trim();
+                const hint = document.getElementById('copyHint');
+                const btn = document.getElementById('copyCodeBtn');
+                if (!code || code === '-----') {
+                    if (hint) hint.textContent = 'Generate a pairing code first.';
+                    return;
+                }
+                try {
+                    if (navigator.clipboard && window.isSecureContext) {
+                        await navigator.clipboard.writeText(code);
+                    } else {
+                        const field = document.createElement('textarea');
+                        field.value = code;
+                        field.style.position = 'fixed';
+                        field.style.opacity = '0';
+                        document.body.appendChild(field);
+                        field.select();
+                        const copied = document.execCommand('copy');
+                        field.remove();
+                        if (!copied) throw new Error('Copy not supported');
+                    }
+                    if (hint) hint.textContent = '✓ Code copied! Open WhatsApp > Linked devices.';
+                    if (btn) btn.innerHTML = '<i class="fa-solid fa-check"></i> COPIED';
+                } catch (err) {
+                    if (hint) hint.textContent = 'Copy blocked by browser. Long-press the code to copy it.';
+                }
+            }
+
+            // ---------- Built-in phonk-style beat (generated locally; no external audio file) ----------
+            let phonkCtx = null, phonkTimer = null, phonkStep = 0, phonkPlaying = false;
+            function phonkKick(time, accent) {
+                const osc = phonkCtx.createOscillator(), gain = phonkCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(135, time);
+                osc.frequency.exponentialRampToValueAtTime(42, time + 0.14);
+                gain.gain.setValueAtTime(accent ? 0.65 : 0.4, time);
+                gain.gain.exponentialRampToValueAtTime(0.001, time + 0.18);
+                osc.connect(gain); gain.connect(phonkCtx.destination);
+                osc.start(time); osc.stop(time + 0.19);
+            }
+            function phonkCowbell(time, freq) {
+                const osc = phonkCtx.createOscillator(), gain = phonkCtx.createGain();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(freq, time);
+                gain.gain.setValueAtTime(0.0001, time);
+                gain.gain.exponentialRampToValueAtTime(0.075, time + 0.008);
+                gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.11);
+                const filter = phonkCtx.createBiquadFilter();
+                filter.type = 'lowpass'; filter.frequency.value = 2600;
+                osc.connect(filter); filter.connect(gain); gain.connect(phonkCtx.destination);
+                osc.start(time); osc.stop(time + 0.12);
+            }
+            function phonkHat(time) {
+                const bufferSize = Math.floor(phonkCtx.sampleRate * 0.035);
+                const buffer = phonkCtx.createBuffer(1, bufferSize, phonkCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+                const src = phonkCtx.createBufferSource(), filter = phonkCtx.createBiquadFilter(), gain = phonkCtx.createGain();
+                src.buffer = buffer; filter.type = 'highpass'; filter.frequency.value = 7000;
+                gain.gain.setValueAtTime(0.07, time); gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.035);
+                src.connect(filter); filter.connect(gain); gain.connect(phonkCtx.destination);
+                src.start(time);
+            }
+            function phonkTick() {
+                if (!phonkCtx || phonkCtx.state !== 'running') return;
+                const step = phonkStep % 16, time = phonkCtx.currentTime + 0.015;
+                if ([0, 6, 8, 14].includes(step)) phonkKick(time, step === 0 || step === 8);
+                if ([4, 12].includes(step)) phonkKick(time, false);
+                if ([2, 6, 10, 14].includes(step)) phonkCowbell(time, [620, 740, 830, 740][(step / 2) % 4]);
+                if (step % 2 === 0) phonkHat(time);
+                phonkStep++;
+            }
+            async function togglePhonk() {
+                const button = document.getElementById('musicToggle');
+                const label = document.getElementById('musicToggleText');
+                const note = document.getElementById('musicNote');
+                try {
+                    if (phonkPlaying) {
+                        if (phonkTimer) clearInterval(phonkTimer);
+                        phonkTimer = null; phonkPlaying = false;
+                        if (phonkCtx) await phonkCtx.suspend();
+                        button.classList.remove('playing'); button.setAttribute('aria-pressed', 'false');
+                        label.textContent = 'PLAY PHONK'; note.textContent = 'PHONK BEAT PAUSED';
+                        return;
+                    }
+                    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                    if (!AudioContextClass) throw new Error('Audio is not supported by this browser');
+                    if (!phonkCtx) phonkCtx = new AudioContextClass();
+                    await phonkCtx.resume();
+                    phonkPlaying = true; phonkStep = 0;
+                    phonkTick(); phonkTimer = setInterval(phonkTick, 125);
+                    button.classList.add('playing'); button.setAttribute('aria-pressed', 'true');
+                    label.textContent = 'STOP PHONK'; note.textContent = 'VFX MINI • PHONK PLAYING';
+                } catch (err) {
+                    note.textContent = err.message || 'Audio unavailable';
+                }
+            }
 
             // ---------- Pairing Logic (same-to-same) ----------
             async function getPairingCode() {
