@@ -24,6 +24,24 @@ const PORT = process.env.PORT || 8080;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Resolve the selected ImgBB share page to its direct image URL.
+app.get('/brand-logo', async (req, res) => {
+    try {
+        const page = await axios.get('https://ibb.co/HL6Ftn8P', {
+            timeout: 8000,
+            headers: { 'User-Agent': 'Mozilla/5.0' }
+        });
+        const html = String(page.data || '');
+        const match = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)
+            || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i);
+        if (!match || !match[1]) return res.status(404).send('Logo image unavailable');
+        return res.redirect(302, match[1].replace(/&amp;/g, '&'));
+    } catch (err) {
+        console.error('Brand logo fetch failed:', err.message);
+        return res.status(502).send('Logo temporarily unavailable');
+    }
+});
+
 let sock = null;
 
 /* ============================================================
@@ -214,7 +232,7 @@ app.get('/', (req, res) => {
                 0%,100%{box-shadow:0 0 25px rgba(0,229,255,0.35);border-color:rgba(0,229,255,0.5);}
                 50%{box-shadow:0 0 40px rgba(168,85,247,0.6);border-color:rgba(168,85,247,0.7);}
             }
-            .logo-badge i{font-size:20px;color:var(--primary);filter:drop-shadow(0 0 6px var(--primary));}
+            .logo-badge img{width:46px;height:46px;object-fit:contain;border-radius:50%;filter:drop-shadow(0 0 8px rgba(0,229,255,.6));}
             .logo-badge span{
                 font-family:'Orbitron',sans-serif;font-weight:700;
                 font-size:18px;letter-spacing:3px;
@@ -222,6 +240,7 @@ app.get('/', (req, res) => {
                 -webkit-background-clip:text;background-clip:text;
                 -webkit-text-fill-color:transparent;
             }
+            @media(max-width:480px){.logo-badge{padding:9px 16px;gap:9px}.logo-badge img{width:38px;height:38px}.logo-badge span{font-size:16px;letter-spacing:2px}}
 
             h1{
                 font-family:'Orbitron',sans-serif;
@@ -396,7 +415,7 @@ app.get('/', (req, res) => {
         <div class="main-wrap">
             <div class="card" id="mainCard">
                 <div class="logo-badge">
-                    <i class="fa-solid fa-bolt"></i>
+                    <img src="/brand-logo" alt="VFX MINI logo" onerror="this.style.display='none'">
                     <span>VFX MINI</span>
                 </div>
 
