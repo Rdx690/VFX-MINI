@@ -312,11 +312,7 @@ async function connectToWhatsApp() {
             const command = body.toLowerCase().split(/\s+/)[0];
             const args = body.split(/\s+/).slice(1).join(' ');
             const noPrefixCommands = new Set([
-                'menu','help','ping','ping1','ping2','ping3','ping4','ping5','settings',
-                'alwaysonline','autoonline','statusview','autoreact','autodl','update','autoupdate',
-                'uptime','play','song','mp3','yta','video','ytvideo','insta','instagram',
-                'tourl','upload','qr','calc','quote','google','g','weather','sticker','s',
-                'ai','tagall','mute','unmute','owner','fancy','vv','clear'
+                'ai', 'alwaysonline', 'autodl', 'autoonline', 'autoreact', 'autostatus', 'autoupdate', 'calc', 'clear', 'fancy', 'font', 'fonts', 'fullpp', 'g', 'getpp', 'google', 'help', 'insta', 'instagram', 'menu', 'mp3', 'mute', 'owner', 'pair', 'ping', 'ping1', 'ping2', 'ping3', 'ping4', 'ping5', 'play', 'prefix', 'qr', 'quote', 's', 'setprefix', 'settings', 'song', 'statusview', 'sticker', 'tagall', 'tourl', 'unmute', 'update', 'upload', 'uptime', 'video', 'vv', 'weather', 'yta', 'ytvideo'
             ]);
             const isCmd = prefixed || noPrefixCommands.has(command);
 
