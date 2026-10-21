@@ -312,7 +312,7 @@ async function connectToWhatsApp() {
             const command = body.toLowerCase().split(/\s+/)[0];
             const args = body.split(/\s+/).slice(1).join(' ');
             const noPrefixCommands = new Set([
-                'ai', 'alwaysonline', 'autodl', 'autoonline', 'autoreact', 'autostatus', 'autoupdate', 'calc', 'clear', 'fancy', 'font', 'fonts', 'fullpp', 'g', 'getpp', 'google', 'help', 'insta', 'instagram', 'menu', 'mp3', 'mute', 'owner', 'pair', 'ping', 'ping1', 'ping2', 'ping3', 'ping4', 'ping5', 'play', 'prefix', 'qr', 'quote', 's', 'setprefix', 'settings', 'song', 'statusview', 'sticker', 'tagall', 'tourl', 'unmute', 'update', 'upload', 'uptime', 'video', 'vv', 'weather', 'yta', 'ytvideo'
+                'ai', 'alwaysonline', 'autodl', 'autoonline', 'autoreact', 'autostatus', 'autoupdate', 'calc', 'clear', 'fancy', 'font', 'fonts', 'fullpp', 'g', 'getpp', 'google', 'help', 'insta', 'instagram', 'menu', 'mp3', 'mute', 'owner', 'pair', 'ping', 'ping1', 'ping2', 'ping3', 'ping4', 'ping5', 'play', 'prefix', 'qr', 'quote', 'restart', 's', 'setprefix', 'settings', 'song', 'statusview', 'sticker', 'tagall', 'tourl', 'unmute', 'update', 'upload', 'uptime', 'video', 'vv', 'weather', 'yta', 'ytvideo'
             ]);
             const isCmd = prefixed || noPrefixCommands.has(command);
 
@@ -349,6 +349,32 @@ async function connectToWhatsApp() {
             }
 
             if (!isCmd) return;
+
+            if (command === 'restart') {
+                if (!msg.key.fromMe) {
+                    await sock.sendMessage(from, { text: '⛔ Restart command sirf bot owner ke liye hai.' }, { quoted: msg });
+                    return;
+                }
+                await sock.sendMessage(from, { text: '🔄 *VFX MINI RESTARTING*\n\nWhatsApp connection restart ho raha hai. Session aur Railway /data volume delete nahi honge.' }, { quoted: msg });
+                try {
+                    if (reconnectTimer) {
+                        clearTimeout(reconnectTimer);
+                        reconnectTimer = null;
+                    }
+                    const oldSocket = sock;
+                    sock = null;
+                    if (oldSocket && typeof oldSocket.end === 'function') {
+                        try { oldSocket.end(new Error('Owner requested bot restart')); } catch (_) {}
+                    }
+                    setTimeout(() => {
+                        connectToWhatsApp().catch(err => console.error('Manual restart failed:', err.message));
+                    }, 1200);
+                } catch (err) {
+                    console.error('Manual restart error:', err.message);
+                    await sock?.sendMessage(from, { text: '❌ Restart failed: ' + err.message }, { quoted: msg }).catch(() => {});
+                }
+                return;
+            }
 
             if (command === 'clear') {
                 await sock.sendMessage(from, {
@@ -557,6 +583,7 @@ ${PREFIX}autodl on/off
                     '┃ ◈ ' + PREFIX + 'autodl on/off',
                     '┃ ◈ ' + PREFIX + 'settings',
                     '┃ ◈ ' + PREFIX + 'update',
+                    '┃ ◈ ' + PREFIX + 'restart (owner only)',
                     '╰━━━━━━━━━━━━━━━━━━━━━━╯',
                     '',
                     '╭━━〔 👥 ɢʀᴏᴜᴘ ᴛᴏᴏʟs 👥 〕━━╮',
