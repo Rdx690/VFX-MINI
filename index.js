@@ -319,7 +319,7 @@ async function connectToWhatsApp() {
             const command = body.toLowerCase().split(/\s+/)[0];
             const args = body.split(/\s+/).slice(1).join(' ');
             const noPrefixCommands = new Set([
-                'ai', 'alwaysonline', 'autodl', 'autoonline', 'autoreact', 'autostatus', 'autoupdate', 'calc', 'clear', 'fancy', 'font', 'fonts', 'fullpp', 'g', 'getpp', 'google', 'greet', 'greetings', 'help', 'insta', 'instagram', 'list', 'menu', 'mp3', 'mute', 'owner', 'pair', 'ping', 'ping1', 'ping2', 'ping3', 'ping4', 'ping5', 'play', 'prefix', 'qr', 'quote', 'restart', 's', 'setprefix', 'settings', 'song', 'statusview', 'sticker', 'tagall', 'tourl', 'unmute', 'update', 'upload', 'uptime', 'video', 'vv', 'weather', 'yta', 'ytvideo'
+                'ai', 'alwaysonline', 'autodl', 'autoonline', 'autoreact', 'autostatus', 'autoupdate', 'calc', 'clear', 'fancy', 'faq', 'font', 'fonts', 'fullpp', 'g', 'getpp', 'google', 'greet', 'greetings', 'help', 'insta', 'instagram', 'list', 'menu', 'mp3', 'mute', 'owner', 'pair', 'ping', 'ping1', 'ping2', 'ping3', 'ping4', 'ping5', 'play', 'prefix', 'qr', 'quote', 'restart', 's', 'setprefix', 'settings', 'song', 'statusview', 'sticker', 'tagall', 'tourl', 'unmute', 'update', 'upload', 'uptime', 'video', 'vv', 'weather', 'yta', 'ytvideo'
             ]);
             const isCmd = prefixed || noPrefixCommands.has(command);
 
@@ -573,6 +573,25 @@ ${PREFIX}autodl on/off
                     }
                 }
                 await sock.sendMessage(from, { text: styles[command] }, { quoted: msg });
+            }
+            else if (command === 'faq') {
+                const faqText = [
+                    '╭━━〔 📘 VFX MINI • FAQ 〕━━╮',
+                    '┃ 1. Open the website pairing portal.',
+                    '┃ 2. Enter your number with country code.',
+                    '┃ 3. Tap GET PAIRING CODE.',
+                    '┃ 4. WhatsApp → Linked devices.',
+                    '┃ 5. Choose Link with phone number and enter the code.',
+                    '┃',
+                    '┃ Keep your pairing code private.',
+                    '┃ Only link an account you own.',
+                    '┃ Session persistence needs a persistent volume.',
+                    '┃ Ban-free use cannot be guaranteed.',
+                    '╰━━━━━━━━━━━━━━━━━━━━━━━━╯',
+                    '',
+                    'Website guide: open your VFX MINI site and tap FAQ / How to use, or visit /faq.'
+                ].join('\\n');
+                await sock.sendMessage(from, { text: faqText }, { quoted: msg });
             }
             else if (command === 'menu' || command === 'help' || command === 'list') {
                 const now = new Date();
