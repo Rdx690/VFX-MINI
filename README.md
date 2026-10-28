@@ -1,19 +1,29 @@
-# VFX MINI ⚡
+# ⚡ VFX MINI
 
-WhatsApp bot with a web-based pairing portal, utility commands and a gradual modular command system.
+**VFX MINI** is a WhatsApp automation bot by **SOURAJIT VFX**, with a web-based pairing portal and a gradually expanding, category-based command system.
 
-## Run
+## Run locally
 ```bash
 npm install
 npm start
 ```
 
-## Modular commands
-- `commands/loader.js` discovers command modules.
-- `commands/general/` contains general commands such as ping and uptime.
-- `commands/owner/` contains owner-only controls such as restart.
+## Command architecture
+Commands are loaded recursively from `commands/`. Each command module exports `name`, optional `aliases`, `category`, `description`, and an async `execute(context)` function.
 
-Existing pairing website and legacy commands are retained during migration.
+Current working modules include:
+- **General:** `.ping`, `.uptime`, `.alive`, `.repo`, `.categories`
+- **Owner:** `.restart` (owner-only)
+- **Greetings:** `.greet list/create/edit/delete/schedule`
+
+Category folders are prepared for the next original VFX MINI command modules: admin, AI, anime, fun, games, media, owner, textmaker, utility and general. The KnightBot-Mini repository is used as a feature reference; its source files are not copied wholesale.
+
+## Hosting and persistent storage
+- Start command: `npm start`
+- Node.js: 20+
+- Set `PUBLIC_URL` to the public URL of your deployed pairing portal if a command needs to display it.
+- Mount persistent storage at `/data` (or set `DATA_DIR`) for WhatsApp session and greeting schedule persistence.
+- Keep secrets and WhatsApp session files out of GitHub.
 
 ## Session safety
-Keep the hosting platform's persistent storage mounted at `/data`. Do not publish WhatsApp session files or reset them unless explicitly requested.
+The existing session flow and pairing portal are retained. Do not delete or reset the session unless you explicitly decide to relink the WhatsApp account. A code push is not proof of a successful live deployment; check the host logs and test commands after deploying.

@@ -1,7 +1,7 @@
 {
   "name": "vfx-mini",
   "version": "1.0.0",
-  "description": "VFX MINI WhatsApp Bot with pairing website and modular command upgrade",
+  "description": "VFX MINI — branded WhatsApp automation bot with pairing portal and modular commands",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
@@ -14,6 +14,7 @@
     "qrcode": "^1.5.3",
     "qrcode-terminal": "^0.12.0",
     "wa-sticker-formatter": "^4.4.4",
-    "yt-search": "^2.10.4"
+    "yt-search": "^2.10.4",
+    "form-data": "^4.0.0"
   }
 }
