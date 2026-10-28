@@ -549,7 +549,7 @@ ${PREFIX}autodl on/off
             }
             else if (command === 'pair') {
                 await sock.sendMessage(from, {
-                    text: '🔗 *VFX MINI PAIRING PORTAL*\n\nOpen the pairing page only if WhatsApp is actually disconnected:\n${process.env.PUBLIC_URL || 'Set PUBLIC_URL to your deployed Koyeb URL'}\n\n⚠️ This command does not relink an already-connected session. If this bot is online, do not pair again. Keep your existing session safe.'
+                    text: '🔗 *VFX MINI PAIRING PORTAL*\n\nOpen the pairing page only if WhatsApp is actually disconnected:\nyour deployed Koyeb URL (set PUBLIC_URL)\n\n⚠️ This command does not relink an already-connected session. If this bot is online, do not pair again. Keep your existing session safe.'
                 }, { quoted: msg });
             }
             else if (['ping', 'ping1', 'ping2', 'ping3', 'ping4', 'ping5'].includes(command)) {
