@@ -739,7 +739,7 @@ ${PREFIX}autodl on/off
                 if (!args) return await sock.sendMessage(from, { text: `❌ Song name taka! e.g. \`${PREFIX}play Blinding Lights\`` }, { quoted: msg });
                 await sock.sendMessage(from, { text: `🎵 Searching: "${args}"...\n⚡ Preparing audio.` }, { quoted: msg });
                 try {
-                    const api = `https://api.sayan-nexuswork.workers.dev/music?query=${encodeURIComponent(args.trim())}`;
+                    const api = `https://api.sayan-nexuswork.workers.dev/play?query=${encodeURIComponent(args.trim())}`;
                     const res = await axios.get(api, { timeout: 20000 });
                     const data = res.data;
                     if (data?.status !== 'success' || !data?.url) {
@@ -773,49 +773,63 @@ ${PREFIX}autodl on/off
                 }
             }
             else if (command === 'mp3' || command === 'yta') {
-                if (!args) return await sock.sendMessage(from, { text: `❌ Song name taka! e.g. \`${PREFIX}mp3 Blinding Lights\`` }, { quoted: msg });
-                await sock.sendMessage(from, { text: '🎵 *Downloading MP3 audio, please wait...*' }, { quoted: msg });
+                if (!args.trim()) return await sock.sendMessage(from, { text: '❌ Song name or YouTube URL do. Example: ' + PREFIX + 'mp3 Shape of You' }, { quoted: msg });
+                await sock.sendMessage(from, { text: '🎵 *MP3 download ho raha hai, wait karo...*' }, { quoted: msg });
                 try {
-                    const api = `https://api.sayan-nexuswork.workers.dev/music?query=${encodeURIComponent(args)}`;
-                    const res = await axios.get(api, { timeout: 30000 });
-                    const data = res.data;
-                    if (data?.status === 'success' && data?.url) {
-                        const title = data.title || 'audio';
-                        await sock.sendMessage(from, { audio: { url: data.url }, mimetype: 'audio/mpeg', ptt: false, fileName: `${title.replace(/[\\/:*?"<>|]/g, '').slice(0, 80)}.mp3` }, { quoted: msg });
-                    } else {
-                        await sock.sendMessage(from, { text: '❌ MP3 download failed. Song not found.' }, { quoted: msg });
+                    let sourceUrl = args.trim();
+                    let track = null;
+                    if (!/^https?:\/\//i.test(sourceUrl)) {
+                        const searchRes = await axios.get('https://api.sayan-nexuswork.workers.dev/play?query=' + encodeURIComponent(sourceUrl), { timeout: 25000 });
+                        track = searchRes.data;
+                        if (track?.status !== 'success' || !track?.videoId) throw new Error('Song search did not return a videoId');
+                        sourceUrl = 'https://www.youtube.com/watch?v=' + track.videoId;
                     }
+                    const api = 'https://eliteprotech-apis.zone.id/download/ytmp3?url=' + encodeURIComponent(sourceUrl);
+                    const res = await axios.get(api, { timeout: 45000, maxRedirects: 5 });
+                    const data = res.data;
+                    const audioUrl = typeof data === 'string' && /^https?:\/\//i.test(data) ? data :
+                        data?.url || data?.downloadUrl || data?.download_url || data?.result?.url ||
+                        data?.result?.downloadUrl || data?.data?.url || data?.data?.downloadUrl;
+                    if (!audioUrl) throw new Error('MP3 API response did not include a download URL');
+                    const title = track?.title || data?.title || data?.result?.title || 'VFX-MINI-Audio';
+                    const audioRes = await axios.get(audioUrl, { responseType: 'arraybuffer', timeout: 90000, maxRedirects: 5, maxContentLength: 25 * 1024 * 1024, headers: { 'User-Agent': 'Mozilla/5.0' } });
+                    const audioBuffer = Buffer.from(audioRes.data);
+                    if (!audioBuffer.length) throw new Error('Empty MP3 response');
+                    const safeTitle = String(title).replace(/[\\/:*?"<>|]/g, '').slice(0, 80) || 'audio';
+                    await sock.sendMessage(from, { audio: audioBuffer, mimetype: 'audio/mpeg', fileName: safeTitle + '.mp3', ptt: false }, { quoted: msg });
                 } catch (e) {
                     console.error('MP3 API error:', e.message);
-                    await sock.sendMessage(from, { text: '❌ Server error while downloading audio.' }, { quoted: msg });
+                    await sock.sendMessage(from, { text: '❌ MP3 download failed. API response/network issue. Try again or send a YouTube URL.' }, { quoted: msg });
                 }
             }
             else if (command === 'video' || command === 'ytvideo') {
-                if (!args) return await sock.sendMessage(from, { text: `❌ Video name taka! e.g. \`${PREFIX}video Tere Naam\`` }, { quoted: msg });
-                await sock.sendMessage(from, { text: `🎬 Searching: "${args}"...\n⏳ Fetching video file, please wait.` }, { quoted: msg });
+                if (!args.trim()) return await sock.sendMessage(from, { text: '❌ Video name or YouTube URL do. Example: ' + PREFIX + 'video Shape of You' }, { quoted: msg });
+                await sock.sendMessage(from, { text: '🎬 *MP4 video download ho raha hai, wait karo...*' }, { quoted: msg });
                 try {
-                    const api = `https://api.sayan-nexuswork.workers.dev/video?query=${encodeURIComponent(args.trim())}`;
-                    const res = await axios.get(api, { timeout: 30000 });
-                    const data = res.data;
-                    if (data?.status !== 'success' || !data?.url) {
-                        return await sock.sendMessage(from, { text: '❌ Video not found or video API failed.' }, { quoted: msg });
+                    let sourceUrl = args.trim();
+                    let track = null;
+                    if (!/^https?:\/\//i.test(sourceUrl)) {
+                        const searchRes = await axios.get('https://api.sayan-nexuswork.workers.dev/play?query=' + encodeURIComponent(sourceUrl), { timeout: 25000 });
+                        track = searchRes.data;
+                        if (track?.status !== 'success' || !track?.videoId) throw new Error('Video search did not return a videoId');
+                        sourceUrl = 'https://www.youtube.com/watch?v=' + track.videoId;
                     }
-                    const caption = `🎬 *VFX MINI VIDEO DOWNLOADER*\n\n📌 *Title:* ${data.title || args}\n⏱️ *Duration:* ${data.duration || 'Unknown'}\n👀 *Views:* ${data.views || 'Unknown'}\n🎙️ *Channel:* ${data.channel || 'Unknown'}\n🎞️ *Quality:* ${data.quality || 'MP4'}`;
-                    // Download bytes first; passing a signed Googlevideo URL directly to Baileys can fail on redirects/network restrictions.
-                    const videoRes = await axios.get(data.url, {
-                        responseType: 'arraybuffer',
-                        timeout: 120000,
-                        maxRedirects: 5,
-                        maxContentLength: 80 * 1024 * 1024,
-                        headers: { 'User-Agent': 'Mozilla/5.0' }
-                    });
+                    const api = 'https://eliteprotech-apis.zone.id/download/ytmp4?url=' + encodeURIComponent(sourceUrl);
+                    const res = await axios.get(api, { timeout: 45000, maxRedirects: 5 });
+                    const data = res.data;
+                    const videoUrl = typeof data === 'string' && /^https?:\/\//i.test(data) ? data :
+                        data?.url || data?.downloadUrl || data?.download_url || data?.result?.url ||
+                        data?.result?.downloadUrl || data?.data?.url || data?.data?.downloadUrl;
+                    if (!videoUrl) throw new Error('MP4 API response did not include a download URL');
+                    const title = track?.title || data?.title || data?.result?.title || 'VFX-MINI-Video';
+                    const videoRes = await axios.get(videoUrl, { responseType: 'arraybuffer', timeout: 120000, maxRedirects: 5, maxContentLength: 80 * 1024 * 1024, headers: { 'User-Agent': 'Mozilla/5.0' } });
                     const videoBuffer = Buffer.from(videoRes.data);
-                    if (!videoBuffer.length) throw new Error('Video response was empty');
-                    await sock.sendMessage(from, { video: videoBuffer, mimetype: 'video/mp4', caption }, { quoted: msg });
+                    if (!videoBuffer.length) throw new Error('Empty MP4 response');
+                    const safeTitle = String(title).replace(/[\\/:*?"<>|]/g, '').slice(0, 80) || 'video';
+                    await sock.sendMessage(from, { video: videoBuffer, mimetype: 'video/mp4', fileName: safeTitle + '.mp4', caption: '🎬 *VFX MINI VIDEO DOWNLOADER*\n' + title }, { quoted: msg });
                 } catch (e) {
-                    console.error('Video download/send error:', e.message);
-                    const reason = e.response?.status ? `HTTP ${e.response.status}` : (e.code || e.message || 'unknown error');
-                    await sock.sendMessage(from, { text: `❌ Video download failed (${reason}). Try a shorter video or retry shortly.` }, { quoted: msg });
+                    console.error('MP4 API error:', e.message);
+                    await sock.sendMessage(from, { text: '❌ MP4 download failed. API response/network issue. Try again or send a YouTube URL.' }, { quoted: msg });
                 }
             }
             else if (command === 'insta' || command === 'instagram') {
