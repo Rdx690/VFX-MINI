@@ -643,7 +643,7 @@ ${PREFIX}autodl on/off
                     '',
                     '✓ = implemented in current VFX MINI code. ⚠ = not implemented or not verified; command may not work.',
                     'Use ' + PREFIX + 'faq for pairing help. Powered by SOURAJIT VFX'
-                ].join('\\n');
+                ].join('\n');
                 if (command === 'list') {
                     const commandGroups = [
                         { title: 'GENERAL & BOT INFO', emoji: '🧰', commands: ['menu ✓', 'help ✓', 'list ✓', 'faq ✓', 'ping ✓', 'ping1 ✓', 'ping2 ✓', 'ping3 ✓', 'ping4 ✓', 'ping5 ✓', 'uptime ✓', 'owner ✓'] },
