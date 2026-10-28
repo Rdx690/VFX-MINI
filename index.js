@@ -832,6 +832,57 @@ ${PREFIX}autodl on/off
                     await sock.sendMessage(from, { text: '❌ MP4 download failed. API response/network issue. Try again or send a YouTube URL.' }, { quoted: msg });
                 }
             }
+            else if (command === 'alldown' || command === 'download') {
+                const sourceUrl = args.trim();
+                if (!/^https?:\/\//i.test(sourceUrl)) {
+                    return await sock.sendMessage(from, { text: '❌ Public media URL bhejo. Example: ' + PREFIX + 'alldown https://example.com/video' }, { quoted: msg });
+                }
+                await sock.sendMessage(from, { text: '📥 *VFX MINI All-in-One Downloader*\nLink check ho raha hai, wait karo...' }, { quoted: msg });
+                try {
+                    const api = 'https://api.sayan-nexuswork.workers.dev/alldown?url=' + encodeURIComponent(sourceUrl);
+                    const res = await axios.get(api, { timeout: 45000, maxRedirects: 5 });
+                    const data = res.data;
+                    const root = data?.result || data?.data || data;
+                    const candidates = [
+                        root?.url, root?.downloadUrl, root?.download_url, root?.link,
+                        root?.video, root?.videoUrl, root?.audio, root?.audioUrl,
+                        root?.media, root?.mediaUrl, root?.image, root?.imageUrl,
+                        ...(Array.isArray(root?.urls) ? root.urls : []),
+                        ...(Array.isArray(root?.medias) ? root.medias.map(item => typeof item === 'string' ? item : item?.url || item?.downloadUrl || item?.link) : []),
+                        ...(Array.isArray(root?.links) ? root.links.map(item => typeof item === 'string' ? item : item?.url || item?.downloadUrl || item?.link) : [])
+                    ].filter(value => typeof value === 'string' && /^https?:\/\//i.test(value));
+                    const mediaUrl = candidates[0];
+                    if (data?.status === 'error' || data?.success === false || !mediaUrl) {
+                        const message = data?.message || data?.error || root?.message;
+                        return await sock.sendMessage(from, { text: '❌ All-in-one API se download link nahi mila.' + (message ? '\\n' + String(message).slice(0, 250) : '') }, { quoted: msg });
+                    }
+                    const title = String(root?.title || root?.filename || data?.title || 'VFX-MINI-Download').replace(/[\\/:*?"<>|]/g, '').slice(0, 80) || 'download';
+                    const mediaRes = await axios.get(mediaUrl, {
+                        responseType: 'arraybuffer',
+                        timeout: 120000,
+                        maxRedirects: 5,
+                        maxContentLength: 80 * 1024 * 1024,
+                        headers: { 'User-Agent': 'Mozilla/5.0' }
+                    });
+                    const buffer = Buffer.from(mediaRes.data);
+                    if (!buffer.length) throw new Error('Empty media response');
+                    const contentType = String(mediaRes.headers['content-type'] || root?.mimeType || root?.mimetype || '').toLowerCase();
+                    const lowerUrl = mediaUrl.toLowerCase().split('?')[0];
+                    if (contentType.includes('image/') || /\\.(jpe?g|png|webp|gif)$/.test(lowerUrl)) {
+                        await sock.sendMessage(from, { image: buffer, caption: '📥 *VFX MINI DOWNLOADER*\n' + title }, { quoted: msg });
+                    } else if (contentType.includes('audio/') || /\\.(mp3|m4a|aac|ogg|opus|wav)$/.test(lowerUrl)) {
+                        await sock.sendMessage(from, { audio: buffer, mimetype: contentType.startsWith('audio/') ? contentType.split(';')[0] : 'audio/mpeg', fileName: title, ptt: false }, { quoted: msg });
+                    } else if (contentType.includes('video/') || /\\.(mp4|mov|mkv|webm)$/.test(lowerUrl)) {
+                        await sock.sendMessage(from, { video: buffer, mimetype: contentType.startsWith('video/') ? contentType.split(';')[0] : 'video/mp4', caption: '📥 *VFX MINI DOWNLOADER*\n' + title }, { quoted: msg });
+                    } else {
+                        await sock.sendMessage(from, { document: buffer, mimetype: contentType.split(';')[0] || 'application/octet-stream', fileName: title }, { quoted: msg });
+                    }
+                } catch (e) {
+                    console.error('All-in-one downloader error:', e.message);
+                    const reason = e.response?.status ? 'HTTP ' + e.response.status : (e.code || e.message || 'unknown error');
+                    await sock.sendMessage(from, { text: '❌ All-in-one download failed (' + reason + '). Check if the URL is public and the API is online.' }, { quoted: msg });
+                }
+            }
             else if (command === 'insta' || command === 'instagram') {
                 if (!args || !/instagram\.com\//i.test(args)) return await sock.sendMessage(from, { text: `❌ Instagram URL taka! e.g. \`${PREFIX}insta https://www.instagram.com/reel/URL\`` }, { quoted: msg });
                 await sock.sendMessage(from, { text: '📥 *Downloading Instagram media...*' }, { quoted: msg });
