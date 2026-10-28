@@ -469,21 +469,26 @@ ${PREFIX}autodl on/off
                 });
             }
             else if (command === 'alwaysonline' || command === 'autoonline') {
-                if (args.toLowerCase() === 'on') {
+                if (!msg.key.fromMe) {
+                    await sock.sendMessage(from, { text: '╭━━〔 🔒 OWNER ONLY 〕━━╮\n┃ Only the bot owner can change this setting.\n╰━━━━━━━━━━━━━━━━━━━━╯' }, { quoted: msg });
+                    return;
+                }
+                const onlineAction = args.trim().toLowerCase();
+                if (onlineAction === 'on') {
                     isAlwaysOnline = true;
                     syncAlwaysOnlineHeartbeat();
                     try { await sock.sendPresenceUpdate('available'); } catch (e) {}
                     try { await sock.sendPresenceUpdate('available', from); } catch (e) {}
-                    await sock.sendMessage(from, { text: '🟢 *Always Online Status is now ACTIVATED!*' }, { quoted: msg });
-                } else if (args.toLowerCase() === 'off') {
+                    await sock.sendMessage(from, { text: '╭━━〔 🟢 VFX MINI 〕━━╮\n┃ Always Online: *ON*\n┃ Presence heartbeat enabled.\n╰━━━━━━━━━━━━━━━━━━━━╯' }, { quoted: msg });
+                } else if (onlineAction === 'off') {
                     isAlwaysOnline = false;
                     syncAlwaysOnlineHeartbeat();
                     try { await sock.sendPresenceUpdate('unavailable'); } catch (e) {}
                     try { await sock.sendPresenceUpdate('unavailable', from); } catch (e) {}
-                    await sock.sendMessage(from, { text: '🔴 *Always Online Status is now DEACTIVATED!*' }, { quoted: msg });
+                    await sock.sendMessage(from, { text: '╭━━〔 🔴 VFX MINI 〕━━╮\n┃ Always Online: *OFF*\n┃ Presence heartbeat disabled.\n╰━━━━━━━━━━━━━━━━━━━━╯' }, { quoted: msg });
                 } else {
-                    await sock.sendMessage(from, { 
-                        text: `⚙️ *Always Online Settings*\n\n🟢 On: \`${PREFIX}alwaysonline on\`\n🔴 Off: \`${PREFIX}alwaysonline off\`\n\n📌 *Status:* ${isAlwaysOnline ? '🟢 ON' : '🔴 OFF'}` 
+                    await sock.sendMessage(from, {
+                        text: `╭━━〔 ⚙️ VFX MINI SETTINGS 〕━━╮\n┃ 🟢 ON: ${PREFIX}alwaysonline on\n┃ 🔴 OFF: ${PREFIX}alwaysonline off\n┃ 📌 STATUS: ${isAlwaysOnline ? '🟢 ON' : '🔴 OFF'}\n╰━━━━━━━━━━━━━━━━━━━━╯`
                     }, { quoted: msg });
                 }
             }
@@ -571,6 +576,7 @@ ${PREFIX}autodl on/off
                     '┃ ⏱️ *ᴜᴘᴛɪᴍᴇ:* ' + uptimeHours + 'h ' + uptimeMinutes + 'm ' + uptimeRemainder + 's',
                     '┃ 🧠 *ʀᴀᴍ:* ' + usedRam + '/' + totalRam + ' MB',
                     '┃ 📥 *ᴀᴜᴛᴏ ᴅʟ:* ' + (isAutoDL ? 'ᴏɴ' : 'ᴏғғ'),
+                    '┃ 🌐 *ᴀʟᴡᴀʏs ᴏɴʟɪɴᴇ:* ' + (isAlwaysOnline ? 'ᴏɴ' : 'ᴏғғ'),
                     '┃ 🗓️ *ᴅᴀᴛᴇ:* ' + now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'Asia/Kolkata' }),
                     '╰━━━━━━━━━━━━━━━━━━━━━━╯',
                     '',
