@@ -183,6 +183,7 @@ async function connectToWhatsApp() {
         auth: state,
         browser: Browsers.ubuntu("Chrome")
     });
+    greetingSystem.setSocket(sock);
 
     sock.ev.on('creds.update', saveCreds);
 
