@@ -319,7 +319,7 @@ async function connectToWhatsApp() {
             const command = body.toLowerCase().split(/\s+/)[0];
             const args = body.split(/\s+/).slice(1).join(' ');
             const noPrefixCommands = new Set([
-                'ai', 'alwaysonline', 'autodl', 'autoonline', 'autoreact', 'autostatus', 'autoupdate', 'calc', 'clear', 'fancy', 'font', 'fonts', 'fullpp', 'g', 'getpp', 'google', 'greet', 'greetings', 'help', 'insta', 'instagram', 'menu', 'mp3', 'mute', 'owner', 'pair', 'ping', 'ping1', 'ping2', 'ping3', 'ping4', 'ping5', 'play', 'prefix', 'qr', 'quote', 'restart', 's', 'setprefix', 'settings', 'song', 'statusview', 'sticker', 'tagall', 'tourl', 'unmute', 'update', 'upload', 'uptime', 'video', 'vv', 'weather', 'yta', 'ytvideo'
+                'ai', 'alwaysonline', 'autodl', 'autoonline', 'autoreact', 'autostatus', 'autoupdate', 'calc', 'clear', 'fancy', 'font', 'fonts', 'fullpp', 'g', 'getpp', 'google', 'greet', 'greetings', 'help', 'insta', 'instagram', 'list', 'menu', 'mp3', 'mute', 'owner', 'pair', 'ping', 'ping1', 'ping2', 'ping3', 'ping4', 'ping5', 'play', 'prefix', 'qr', 'quote', 'restart', 's', 'setprefix', 'settings', 'song', 'statusview', 'sticker', 'tagall', 'tourl', 'unmute', 'update', 'upload', 'uptime', 'video', 'vv', 'weather', 'yta', 'ytvideo'
             ]);
             const isCmd = prefixed || noPrefixCommands.has(command);
 
@@ -574,7 +574,7 @@ ${PREFIX}autodl on/off
                 }
                 await sock.sendMessage(from, { text: styles[command] }, { quoted: msg });
             }
-            else if (command === 'menu' || command === 'help') {
+            else if (command === 'menu' || command === 'help' || command === 'list') {
                 const now = new Date();
                 const uptimeSeconds = Math.floor(process.uptime());
                 const uptimeHours = Math.floor(uptimeSeconds / 3600);
@@ -652,6 +652,29 @@ ${PREFIX}autodl on/off
                     '',
                     '╰━━━『 ⚡ ᴘᴏᴡᴇʀᴇᴅ ʙʏ 𝐒𝐎𝐔𝐑𝐀𝐉𝐈𝐓 𝐕𝐅𝐗 』━━━╯'
                 ].join('\n');
+                if (command === 'list') {
+                    const commandGroups = [
+                        { title: 'GENERAL', emoji: '🧰', commands: ['alive', 'categories', 'ping', 'uptime', 'repo'] },
+                        { title: 'AI & TEXT', emoji: '✨', commands: ['ai', 'google', 'weather', 'quote', 'fancy', 'font', 'fonts'] },
+                        { title: 'MEDIA', emoji: '🎬', commands: ['play', 'song', 'mp3', 'video', 'insta', 'instagram', 'yta', 'ytvideo', 'sticker', 'tourl', 'vv'] },
+                        { title: 'TOOLS', emoji: '🔧', commands: ['calc', 'qr', 'getpp', 'fullpp', 'greet', 'greetings'] },
+                        { title: 'SETTINGS', emoji: '⚙️', commands: ['setprefix', 'alwaysonline', 'statusview', 'autoreact', 'autodl', 'settings'] },
+                        { title: 'GROUP', emoji: '👥', commands: ['tagall', 'mute', 'unmute'] },
+                        { title: 'OWNER', emoji: '👑', commands: ['owner', 'restart', 'update'] }
+                    ];
+                    const listText = [
+                        '╭━━〔 ⚡ VFX MINI • COMMAND LIST 〕━━╮',
+                        ...commandGroups.flatMap(group => [
+                            '',
+                            '╭─❏ ' + group.emoji + ' ' + group.title + ' ❏',
+                            ...group.commands.slice().sort().map(name => '│ ' + PREFIX + name),
+                            '╰────────────────────'
+                        ]),
+                        '',
+                        'Inspired by Levanter menu organization • Powered by SOURAJIT VFX'
+                    ].join('\\n');
+                    return await sock.sendMessage(from, { text: listText }, { quoted: msg });
+                }
                 try {
                     const page = await axios.get('https://ibb.co/HL6Ftn8P', { timeout: 12000 });
                     const html = typeof page.data === 'string' ? page.data : '';
