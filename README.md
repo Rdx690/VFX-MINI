@@ -1,21 +1,19 @@
+# VFX MINI ⚡
 
+WhatsApp bot with a web-based pairing portal, utility commands and a gradual modular command system.
 
-
-
-
-
-
-
-
-
-
-
-
-**Tarmux Setup**
-
-pkg update && pkg upgrade -y
-pkg install nodejs git -y
-git clone https://github.com/YOUR-GITHUB-USERNAME/RAHUL-AI-MINI.git
-cd RAHUL-AI-MINI
+## Run
+```bash
 npm install
-node index.js
+npm start
+```
+
+## Modular commands
+- `commands/loader.js` discovers command modules.
+- `commands/general/` contains general commands such as ping and uptime.
+- `commands/owner/` contains owner-only controls such as restart.
+
+Existing pairing website and legacy commands are retained during migration.
+
+## Session safety
+Keep the hosting platform's persistent storage mounted at `/data`. Do not publish WhatsApp session files or reset them unless explicitly requested.
