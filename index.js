@@ -595,83 +595,71 @@ ${PREFIX}autodl on/off
                 const uptimeRemainder = uptimeSeconds % 60;
                 const usedRam = Math.round(process.memoryUsage().rss / 1024 / 1024);
                 const totalRam = Math.round(require('os').totalmem() / 1024 / 1024);
-                const menuGroups = [
-                    { title: 'ᴀɪ', commands: ['BING ⚠', 'DALL ⚠', 'GEMINI ⚠', 'GPT ⚠', 'GROQ ⚠', 'OR ⚠', 'UPSCALE ⚠'] },
-                    { title: 'ᴀᴜᴅɪᴏ', commands: ['AVEC ⚠', 'BASS ⚠', 'BLACK ⚠', 'BLOWN ⚠', 'CUT ⚠', 'DEEP ⚠', 'EARRAPE ⚠', 'FAST ⚠', 'FAT ⚠', 'HISTO ⚠', 'LOW ⚠', 'NIGHTCORE ⚠', 'PITCH ⚠', 'ROBOT ⚠', 'SLOW ⚠', 'SMOOTH ⚠', 'TREBLE ⚠', 'TUPAI ⚠', 'VECTOR ⚠'] },
-                    { title: 'ᴀᴜᴛᴏʀᴇᴘʟʏ', commands: ['FILTER ⚠', 'GFILTER ⚠', 'GSTOP ⚠', 'PFILTER ⚠', 'PSTOP ⚠', 'STOP ⚠'] },
-                    { title: 'ʙᴏᴛ', commands: ['BACKUP ⚠', 'GAUTH ⚠', 'GUPLOAD ⚠', 'REMINDER ⚠', 'TASK ⚠', 'TOG ⚠', 'UPDATE ✓', 'UPDATE NOW ⚠', 'YTLOGIN ⚠'] },
-                    { title: 'ʙᴜᴅɢᴇᴛ', commands: ['BUDGET ⚠', 'DELBUDGET ⚠', 'EXPENSE ⚠', 'INCOME ⚠', 'SUMMARY ⚠'] },
-                    { title: 'ᴅᴏᴄᴜᴍᴇɴᴛ', commands: ['PAGE ⚠', 'PDF ⚠'] },
-                    { title: 'ᴅᴏᴡɴʟᴏᴀᴅ', commands: ['APK ⚠', 'FB ⚠', 'FULLSS ⚠', 'INSTA ✓', 'MEDIAFIRE ⚠', 'PINTEREST ⚠', 'REDDIT ⚠', 'SONG ⚠', 'SPOTIFY ⚠', 'SS ⚠', 'STORY ⚠', 'TIKTOK ⚠', 'TWITTER ⚠', 'UPLOAD ⚠', 'VIDEO ✓', 'YTA ⚠', 'YTV ⚠', 'PLAY ✓', 'MP3 ✓'] },
-                    { title: 'ᴇᴅɪᴛᴏʀ', commands: ['BLOODY ⚠', 'BOKEH ⚠', 'CARTOON ⚠', 'COLOR ⚠', 'DARK ⚠', 'DEMON ⚠', 'ENHANCE ⚠', 'GANDM ⚠', 'HORNED ⚠', 'KISS ⚠', 'LOOK ⚠', 'MAKEUP ⚠', 'PENCIL ⚠', 'SKETCH ⚠', 'SKULL ⚠', 'WANTED ⚠', 'ZOMBIE ⚠'] },
-                    { title: 'ɢᴀᴍᴇ', commands: ['TICTACTOE ⚠', 'WCG ⚠', 'WRG ⚠'] },
-                    { title: 'ɢʀᴏᴜᴘ', commands: ['ADD ⚠', 'AMUTE ⚠', 'ANTIFAKE ⚠', 'ANTIGM ⚠', 'ANTIGSTATUS ⚠', 'ANTILINK ⚠', 'ANTISPAM ⚠', 'ANTIWORD ⚠', 'AUNMUTE ⚠', 'COMMON ⚠', 'DEMOTE ⚠', 'GINFO ⚠', 'GOODBYE ⚠', 'GPP ⚠', 'GSTATUS ⚠', 'INACTIVE ⚠', 'INVITE ⚠', 'JOIN ⚠', 'KICK ⚠', 'MSGS ⚠', 'MUTE ✓', 'PDM ⚠', 'PROMOTE ⚠', 'RESET ⚠', 'REVOKE ⚠', 'TAG ⚠', 'UNMUTE ✓', 'VOTE ⚠', 'WARN ⚠', 'WELCOME ⚠', 'TAGALL ✓'] },
-                    { title: 'ʟᴏɢɪᴀ', commands: ['OPE ⚠', 'YAMI ⚠', 'ZUSHI ⚠'] },
-                    { title: 'ᴍɪsᴄ', commands: ['AFK ⚠', 'ALIVE ⚠', 'AVM ⚠', 'CALC ✓', 'DELCMD ⚠', 'FANCY ✓', 'FORWARD ⚠', 'GETCMD ⚠', 'LYDIA ⚠', 'MENTION ⚠', 'MFORWARD ⚠', 'NEWS ⚠', 'PING ✓', 'PLAY ✓', 'QR ✓', 'REBOOT ⚠', 'RMBG ⚠', 'SAVE ⚠', 'SETCMD ⚠', 'TTS ⚠', 'URL ⚠', 'WHOIS ⚠', 'UPTIME ✓', 'FAQ ✓', 'OWNER ✓'] },
-                    { title: 'ᴘᴇʀsᴏɴᴀʟ', commands: ['DELGREET ⚠', 'GETGREET ⚠', 'SETGREET ⚠', 'GREET ✓'] },
-                    { title: 'ᴘʟᴜɢɪɴ', commands: ['PLUGIN ⚠', 'REMOVE ⚠'] },
-                    { title: 'sᴄʜᴇᴅᴜʟᴇ', commands: ['DELSCHEDULE ⚠', 'GETSCHEDULE ⚠', 'SETSCHEDULE ⚠'] },
-                    { title: 'sᴇᴀʀᴄʜ', commands: ['EMIX ⚠', 'EMOJI ⚠', 'FIND ⚠', 'IG ⚠', 'IMG ⚠', 'ISON ⚠', 'JEAN ⚠', 'MOVIE ⚠', 'TIME ⚠', 'TRT ⚠', 'WEATHER ✓', 'YTS ⚠', 'GOOGLE ✓'] },
-                    { title: 'sᴛɪᴄᴋᴇʀ', commands: ['CIRCLE ⚠', 'EXIF ⚠', 'MP4 ⚠', 'PHOTO ⚠', 'STICKER ✓', 'TAKE ⚠', 'TG ⚠', 'TOURL ✓'] },
-                    { title: 'ᴛᴇxᴛᴍᴀᴋᴇʀ', commands: ['3D ⚠', 'ANGEL ⚠', 'AVENGER ⚠', 'BLUB ⚠', 'BPINK ⚠', 'CAT ⚠', 'GLITCH ⚠', 'GLITTER ⚠', 'GRAFFITI ⚠', 'HACKER ⚠', 'LIGHT ⚠', 'MARVEL ⚠', 'NEON ⚠', 'SCI ⚠', 'SIGN ⚠', 'TATTOO ⚠', 'WATERCOLOR ⚠'] },
-                    { title: 'ᴜsᴇʀ', commands: ['BLOCK ⚠', 'FULLPP ✓', 'GJID ⚠', 'JID ⚠', 'LEFT ⚠', 'PP ✓', 'UNBLOCK ⚠'] },
-                    { title: 'ᴠᴀʀs', commands: ['ALLVAR ⚠', 'DELSUDO ⚠', 'DELVAR ⚠', 'GETSUDO ⚠', 'GETVAR ⚠', 'SETSUDO ⚠', 'SETVAR ⚠'] },
-                    { title: 'ᴠɪᴅᴇᴏ', commands: ['COMPRESS ⚠', 'CROP ⚠', 'MERGE ⚠', 'MP3 ✓', 'REVERSE ⚠', 'ROTATE ⚠', 'TRIM ⚠'] },
-                    { title: 'ᴡʜᴀᴛsᴀᴘᴘ', commands: ['ANTIEDIT ⚠', 'CALL ⚠', 'CAPTION ⚠', 'CINFO ⚠', 'CLEAR ⚠', 'CREACT ⚠', 'DELETE ⚠', 'DLT ⚠', 'DOC ⚠', 'ONLINE ⚠', 'POLL ⚠', 'REACT ⚠', 'READ ⚠', 'SCSTATUS ⚠', 'SETSTATUS ⚠', 'STATUS ⚠', 'VV ✓'] }
-                ];
                 const menuText = [
-                    '╭═══ VFX MINI═══⊷',
-                    '┃❃╭──────────────',
-                    '┃❃│ Prefix : ' + PREFIX,
-                    '┃❃│ User : 𝐒ꭷᴜʀᴀᴊɪᴛ メ 𝐕𝐅𝐗',
-                    '┃❃│ Time : ' + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' }),
-                    '┃❃│ Day : ' + now.toLocaleDateString('en-US', { weekday: 'long', timeZone: 'Asia/Kolkata' }),
-                    '┃❃│ Date : ' + now.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Asia/Kolkata' }),
-                    '┃❃│ Version : 1.0.0',
-                    '┃❃│ Plugins : ' + (commandRegistry?.length || Object.keys(commandRegistry || {}).length || 0),
-                    '┃❃│ Ram : ' + usedRam + '/' + totalRam + 'MB',
-                    '┃❃│ Uptime : ' + uptimeHours + 'h ' + uptimeMinutes + 'm ' + uptimeRemainder + 's',
-                    '┃❃│ Platform : ' + process.platform,
-                    '┃❃╰───────────────',
+                    '╭═══ VFX MINI ═══⊷',
+                    '┃ Prefix : ' + PREFIX,
+                    '┃ User : 𝐒ꭷᴜʀᴀᴊɪᴛ メ 𝐕𝐅𝐗',
+                    '┃ Time : ' + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' }),
+                    '┃ Date : ' + now.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Asia/Kolkata' }),
+                    '┃ Status : ' + (sock?.user ? 'Online' : 'Starting'),
+                    '┃ RAM : ' + usedRam + '/' + totalRam + ' MB',
+                    '┃ Uptime : ' + uptimeHours + 'h ' + uptimeMinutes + 'm ' + uptimeRemainder + 's',
                     '╰═════════════════⊷',
-                    ...menuGroups.flatMap(group => [
-                        '',
-                        '╭─❏ ' + group.title + ' ❏',
-                        ...group.commands.map(name => ' │ ' + name),
-                        ' ╰─────────────────'
-                    ]),
                     '',
-                    '✓ = implemented in current VFX MINI code. ⚠ = not implemented or not verified; command may not work.',
-                    'Use ' + PREFIX + 'faq for pairing help. Powered by SOURAJIT VFX'
-                ].join('\n');
-                if (command === 'list') {
-                    const commandGroups = [
-                        { title: 'GENERAL & BOT INFO', emoji: '🧰', commands: ['menu ✓', 'help ✓', 'list ✓', 'faq ✓', 'ping ✓', 'ping1 ✓', 'ping2 ✓', 'ping3 ✓', 'ping4 ✓', 'ping5 ✓', 'uptime ✓', 'owner ✓'] },
-                        { title: 'DOWNLOADER', emoji: '📥', commands: ['play <song> ✓', 'mp3 <song> ✓', 'video <name/url> ✓', 'insta <url> ✓', 'Auto-download public links ✓', 'song <query> ⚠ NOT VERIFIED', 'yta <url> ⚠ NOT VERIFIED', 'ytvideo <url> ⚠ NOT VERIFIED', 'instagram <url> ⚠ NOT VERIFIED'] },
-                        { title: 'AI & SEARCH', emoji: '🧠', commands: ['ai <text> ✓', 'google <query> ✓', 'weather <city> ✓', 'quote ✓'] },
-                        { title: 'TEXT & FONTS', emoji: '✍️', commands: ['fancy <text> ✓', 'font <text> ✓', 'fonts ⚠ NOT VERIFIED', 'g <text> ⚠ NOT VERIFIED'] },
-                        { title: 'MEDIA & UTILITIES', emoji: '🛠️', commands: ['calc <math> ✓', 'qr <text> ✓', 'tourl (reply to media) ✓', 'sticker (reply to image) ✓', 'getpp ✓', 'fullpp ✓', 'vv (reply to view-once media) ✓', 'categories ⚠ NOT VERIFIED', 'repo ⚠ NOT VERIFIED', 'alive ⚠ NOT VERIFIED'] },
-                        { title: 'GROUP TOOLS', emoji: '👥', commands: ['tagall <message> ✓ (groups)', 'mute ✓ (groups)', 'unmute ✓ (groups)'] },
-                        { title: 'SETTINGS', emoji: '⚙️', commands: ['settings ✓', 'setprefix <symbol> ✓', 'alwaysonline on/off ✓', 'statusview on/off ✓', 'autoreact on/off ✓', 'autodl on/off ✓'] },
-                        { title: 'OWNER', emoji: '👑', commands: ['owner ✓', 'restart ✓ (owner only)', 'update ✓ (requires Git checkout)', 'clear ✓ (help message only)', 'pair ✓ (pairing guidance)'] },
-                        { title: 'GREETINGS', emoji: '👋', commands: ['greet list/create/edit/delete/schedule ✓ (depends on greeting setup)'] }
-                    ];
-                    const listText = [
-                        '╭━━〔 ⚡ VFX MINI • FULL COMMAND MENU 〕━━╮',
-                        '│ Prefix: ' + PREFIX,
-                        '│ Use the command shown in each category.',
-                        ...commandGroups.flatMap(group => [
-                            '',
-                            '╭─❏ ' + group.emoji + ' ' + group.title + ' ❏',
-                            ...group.commands.slice().sort().map(name => '│ ' + PREFIX + name),
-                            '╰────────────────────'
-                        ]),
-                        '',
-                        '✓ = implemented in the current code. ⚠ NOT VERIFIED = not confirmed as working; do not rely on it.\nTip: Send ' + PREFIX + 'faq for pairing help.',
-                        'Powered by SOURAJIT VFX • Levanter-inspired menu layout'
-                    ].join('\n');
-                    return await sock.sendMessage(from, { text: listText }, { quoted: msg });
-                }
+                    '╭─❏ GENERAL ❏',
+                    '│ ' + PREFIX + 'menu',
+                    '│ ' + PREFIX + 'list',
+                    '│ ' + PREFIX + 'help',
+                    '│ ' + PREFIX + 'ping',
+                    '│ ' + PREFIX + 'uptime',
+                    '│ ' + PREFIX + 'owner',
+                    '│ ' + PREFIX + 'faq',
+                    '╰─────────────────',
+                    '',
+                    '╭─❏ DOWNLOAD ❏',
+                    '│ ' + PREFIX + 'play <song>',
+                    '│ ' + PREFIX + 'mp3 <song>',
+                    '│ ' + PREFIX + 'video <name or URL>',
+                    '│ ' + PREFIX + 'insta <URL>',
+                    '╰─────────────────',
+                    '',
+                    '╭─❏ AI & SEARCH ❏',
+                    '│ ' + PREFIX + 'ai <text>',
+                    '│ ' + PREFIX + 'google <query>',
+                    '│ ' + PREFIX + 'weather <city>',
+                    '│ ' + PREFIX + 'quote',
+                    '╰─────────────────',
+                    '',
+                    '╭─❏ TOOLS ❏',
+                    '│ ' + PREFIX + 'calc <math>',
+                    '│ ' + PREFIX + 'qr <text>',
+                    '│ ' + PREFIX + 'tourl (reply to media)',
+                    '│ ' + PREFIX + 'sticker (reply to image)',
+                    '│ ' + PREFIX + 'fancy <text>',
+                    '│ ' + PREFIX + 'getpp',
+                    '│ ' + PREFIX + 'fullpp',
+                    '│ ' + PREFIX + 'vv (reply to view-once media)',
+                    '╰─────────────────',
+                    '',
+                    '╭─❏ GROUP ❏',
+                    '│ ' + PREFIX + 'tagall <message>',
+                    '│ ' + PREFIX + 'mute',
+                    '│ ' + PREFIX + 'unmute',
+                    '╰─────────────────',
+                    '',
+                    '╭─❏ SETTINGS ❏',
+                    '│ ' + PREFIX + 'settings',
+                    '│ ' + PREFIX + 'setprefix <symbol>',
+                    '│ ' + PREFIX + 'alwaysonline on/off',
+                    '│ ' + PREFIX + 'statusview on/off',
+                    '│ ' + PREFIX + 'autoreact on/off',
+                    '│ ' + PREFIX + 'autodl on/off',
+                    '╰─────────────────',
+                    '',
+                    'Note: Commands work only where implemented and permissions allow.',
+                    'Powered by SOURAJIT VFX'
+                ].join('\\n');
+                return await sock.sendMessage(from, { text: menuText }, { quoted: msg });
                 try {
                     const page = await axios.get('https://ibb.co/HL6Ftn8P', { timeout: 12000 });
                     const html = typeof page.data === 'string' ? page.data : '';
