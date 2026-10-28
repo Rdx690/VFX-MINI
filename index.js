@@ -419,7 +419,7 @@ async function connectToWhatsApp() {
                     || msg.message.viewOnceMessage?.message
                     || msg.message.viewOnceMessageV2?.message;
                 if (!viewOnce) {
-                    await sock.sendMessage(from, { text: '👁️ *VV Command*\n\nView-once photo/video ko reply karke vv bhejo. Sirf woh media process hoga jo WhatsApp/Baileys is session mein accessible rakhta hai.' }, { quoted: msg });
+                    await sock.sendMessage(from, { text: '╭━━〔 👁️ VFX MINI • VV 〕━━╮\n┃ View-once photo/video ko reply karke .vv bhejo.\n┃ Sirf media process hoga jo WhatsApp/Baileys is session mein accessible rakhta hai.\n╰━━━━━━━━━━━━━━━━━━━━━━╯' }, { quoted: msg });
                     return;
                 }
                 const mediaMsg = { key: msg.key, message: viewOnce };
@@ -434,7 +434,7 @@ async function connectToWhatsApp() {
                     }
                 } catch (e) {
                     console.error('VV media error:', e.message);
-                    await sock.sendMessage(from, { text: '❌ Media decrypt nahi hua. WhatsApp session/media key unavailable ho sakti hai.' }, { quoted: msg });
+                    await sock.sendMessage(from, { text: '╭━━〔 ⚠️ VV ERROR 〕━━╮\n┃ Media decrypt nahi hua.\n┃ WhatsApp session ya media key unavailable ho sakti hai.\n╰━━━━━━━━━━━━━━━━━━━━━━╯' }, { quoted: msg });
                 }
                 return;
             }
@@ -599,6 +599,9 @@ ${PREFIX}autodl on/off
                     '',
                     '╭━━〔 🧰 ᴛᴏᴏʟs 🧰 〕━━╮',
                     '┃ ◈ ' + PREFIX + 'ping / ping1 / ping2 / ping3 / ping4 / ping5',
+                    '┃ ◈ ' + PREFIX + 'alive (bot status)',
+                    '┃ ◈ ' + PREFIX + 'repo (GitHub repository)',
+                    '┃ ◈ ' + PREFIX + 'vv (reply to view-once media)',
                     '┃ ◈ ' + PREFIX + 'pair (pairing portal)',
                     '┃ ◈ ' + PREFIX + 'uptime',
                     '┃ ◈ ' + PREFIX + 'calc <math>',
