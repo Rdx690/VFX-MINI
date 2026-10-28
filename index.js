@@ -18,6 +18,7 @@ const { Sticker, StickerTypes } = require('wa-sticker-formatter');
 const { exec } = require('child_process');
 const FormData = require('form-data');
 const registerWebsite = require('./website');
+const commandRegistry = require('./commands/loader');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -349,6 +350,33 @@ async function connectToWhatsApp() {
             }
 
             if (!isCmd) return;
+
+            const modularHandled = await commandRegistry.execute(command, {
+                sock,
+                msg,
+                from,
+                args: text.trim().split(/\\s+/).slice(1),
+                reply: async (message) => sock.sendMessage(from, { text: message }, { quoted: msg }),
+                restartBot: async () => {
+                    if (reconnectTimer) {
+                        clearTimeout(reconnectTimer);
+                        reconnectTimer = null;
+                    }
+                    const oldSocket = sock;
+                    sock = null;
+                    try {
+                        if (oldSocket && typeof oldSocket.end === 'function') {
+                            oldSocket.end(new Error('Owner requested VFX MINI restart'));
+                        }
+                    } catch (err) {
+                        console.warn('Socket close during restart:', err.message);
+                    }
+                    setTimeout(() => {
+                        connectToWhatsApp().catch(err => console.error('Manual restart failed:', err.message));
+                    }, 1200);
+                }
+            });
+            if (modularHandled) return;
 
             if (command === 'restart') {
                 if (!msg.key.fromMe) {
