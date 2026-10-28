@@ -669,20 +669,25 @@ ${PREFIX}autodl on/off
                     '┃ ◈ ' + PREFIX + 'owner',
                     '╰━━━━━━━━━━━━━━━━━━━━━━╯',
                     '',
+                    '┃ 📚 *ʀᴇᴀᴅ ᴍᴏʀᴇ:* ' + PREFIX + 'list (full categorized command menu)',
                     '╰━━━『 ⚡ ᴘᴏᴡᴇʀᴇᴅ ʙʏ 𝐒𝐎𝐔𝐑𝐀𝐉𝐈𝐓 𝐕𝐅𝐗 』━━━╯'
                 ].join('\n');
                 if (command === 'list') {
                     const commandGroups = [
-                        { title: 'GENERAL', emoji: '🧰', commands: ['alive', 'categories', 'ping', 'uptime', 'repo'] },
-                        { title: 'AI & TEXT', emoji: '✨', commands: ['ai', 'google', 'weather', 'quote', 'fancy', 'font', 'fonts'] },
-                        { title: 'MEDIA', emoji: '🎬', commands: ['play', 'song', 'mp3', 'video', 'insta', 'instagram', 'yta', 'ytvideo', 'sticker', 'tourl', 'vv'] },
-                        { title: 'TOOLS', emoji: '🔧', commands: ['calc', 'qr', 'getpp', 'fullpp', 'greet', 'greetings'] },
-                        { title: 'SETTINGS', emoji: '⚙️', commands: ['setprefix', 'alwaysonline', 'statusview', 'autoreact', 'autodl', 'settings'] },
-                        { title: 'GROUP', emoji: '👥', commands: ['tagall', 'mute', 'unmute'] },
-                        { title: 'OWNER', emoji: '👑', commands: ['owner', 'restart', 'update'] }
+                        { title: 'GENERAL & BOT INFO', emoji: '🧰', commands: ['alive', 'categories', 'faq', 'help', 'menu', 'ping', 'ping1', 'ping2', 'ping3', 'ping4', 'ping5', 'repo', 'uptime'] },
+                        { title: 'DOWNLOADER', emoji: '📥', commands: ['play <song>', 'song <song/url>', 'mp3 <song/reply media>', 'video <name/url>', 'yta <url>', 'ytvideo <url>', 'insta <url>', 'instagram <url>', 'autodl on/off'] },
+                        { title: 'AI & SEARCH', emoji: '🧠', commands: ['ai <text>', 'google <query>', 'weather <city>', 'quote'] },
+                        { title: 'TEXT MAKER & FONTS', emoji: '✍️', commands: ['fancy <text>', 'font <text>', 'fonts', 'g <text>'] },
+                        { title: 'MEDIA & UTILITIES', emoji: '🔧', commands: ['calc <math>', 'qr <text>', 'tourl (reply media)', 'sticker (reply image)', 'getpp', 'fullpp', 'vv (reply to view-once media)'] },
+                        { title: 'GROUP TOOLS', emoji: '👥', commands: ['tagall <message>', 'mute', 'unmute'] },
+                        { title: 'SETTINGS', emoji: '⚙️', commands: ['setprefix <symbol>', 'alwaysonline on/off', 'statusview on/off', 'autoreact on/off', 'settings'] },
+                        { title: 'OWNER', emoji: '👑', commands: ['owner', 'restart', 'update', 'clear'] },
+                        { title: 'GREETINGS', emoji: '👋', commands: ['greet list', 'greet create', 'greet edit', 'greet delete', 'greet schedule'] }
                     ];
                     const listText = [
-                        '╭━━〔 ⚡ VFX MINI • COMMAND LIST 〕━━╮',
+                        '╭━━〔 ⚡ VFX MINI • FULL COMMAND MENU 〕━━╮',
+                        '│ Prefix: ' + PREFIX,
+                        '│ Use the command shown in each category.',
                         ...commandGroups.flatMap(group => [
                             '',
                             '╭─❏ ' + group.emoji + ' ' + group.title + ' ❏',
@@ -690,7 +695,8 @@ ${PREFIX}autodl on/off
                             '╰────────────────────'
                         ]),
                         '',
-                        'Inspired by Levanter menu organization • Powered by SOURAJIT VFX'
+                        'Tip: Send ' + PREFIX + 'faq for pairing help.',
+                        'Powered by SOURAJIT VFX • Levanter-inspired menu layout'
                     ].join('\\n');
                     return await sock.sendMessage(from, { text: listText }, { quoted: msg });
                 }
