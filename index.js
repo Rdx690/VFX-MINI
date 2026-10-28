@@ -668,15 +668,15 @@ ${PREFIX}autodl on/off
                 ].join('\n');
                 if (command === 'list') {
                     const commandGroups = [
-                        { title: 'GENERAL & BOT INFO', emoji: '🧰', commands: ['alive', 'categories', 'faq', 'help', 'menu', 'ping', 'ping1', 'ping2', 'ping3', 'ping4', 'ping5', 'repo', 'uptime'] },
-                        { title: 'DOWNLOADER', emoji: '📥', commands: ['play <song>', 'song <song/url>', 'mp3 <song/reply media>', 'video <name/url>', 'yta <url>', 'ytvideo <url>', 'insta <url>', 'instagram <url>', 'autodl on/off'] },
-                        { title: 'AI & SEARCH', emoji: '🧠', commands: ['ai <text>', 'google <query>', 'weather <city>', 'quote'] },
-                        { title: 'TEXT MAKER & FONTS', emoji: '✍️', commands: ['fancy <text>', 'font <text>', 'fonts', 'g <text>'] },
-                        { title: 'MEDIA & UTILITIES', emoji: '🔧', commands: ['calc <math>', 'qr <text>', 'tourl (reply media)', 'sticker (reply image)', 'getpp', 'fullpp', 'vv (reply to view-once media)'] },
-                        { title: 'GROUP TOOLS', emoji: '👥', commands: ['tagall <message>', 'mute', 'unmute'] },
-                        { title: 'SETTINGS', emoji: '⚙️', commands: ['setprefix <symbol>', 'alwaysonline on/off', 'statusview on/off', 'autoreact on/off', 'settings'] },
-                        { title: 'OWNER', emoji: '👑', commands: ['owner', 'restart', 'update', 'clear'] },
-                        { title: 'GREETINGS', emoji: '👋', commands: ['greet list', 'greet create', 'greet edit', 'greet delete', 'greet schedule'] }
+                        { title: 'GENERAL & BOT INFO', emoji: '🧰', commands: ['menu ✓', 'help ✓', 'list ✓', 'faq ✓', 'ping ✓', 'ping1 ✓', 'ping2 ✓', 'ping3 ✓', 'ping4 ✓', 'ping5 ✓', 'uptime ✓', 'owner ✓'] },
+                        { title: 'DOWNLOADER', emoji: '📥', commands: ['play <song> ✓', 'mp3 <song> ✓', 'video <name/url> ✓', 'insta <url> ✓', 'Auto-download public links ✓', 'song <query> ⚠ NOT VERIFIED', 'yta <url> ⚠ NOT VERIFIED', 'ytvideo <url> ⚠ NOT VERIFIED', 'instagram <url> ⚠ NOT VERIFIED'] },
+                        { title: 'AI & SEARCH', emoji: '🧠', commands: ['ai <text> ✓', 'google <query> ✓', 'weather <city> ✓', 'quote ✓'] },
+                        { title: 'TEXT & FONTS', emoji: '✍️', commands: ['fancy <text> ✓', 'font <text> ✓', 'fonts ⚠ NOT VERIFIED', 'g <text> ⚠ NOT VERIFIED'] },
+                        { title: 'MEDIA & UTILITIES', emoji: '🛠️', commands: ['calc <math> ✓', 'qr <text> ✓', 'tourl (reply to media) ✓', 'sticker (reply to image) ✓', 'getpp ✓', 'fullpp ✓', 'vv (reply to view-once media) ✓', 'categories ⚠ NOT VERIFIED', 'repo ⚠ NOT VERIFIED', 'alive ⚠ NOT VERIFIED'] },
+                        { title: 'GROUP TOOLS', emoji: '👥', commands: ['tagall <message> ✓ (groups)', 'mute ✓ (groups)', 'unmute ✓ (groups)'] },
+                        { title: 'SETTINGS', emoji: '⚙️', commands: ['settings ✓', 'setprefix <symbol> ✓', 'alwaysonline on/off ✓', 'statusview on/off ✓', 'autoreact on/off ✓', 'autodl on/off ✓'] },
+                        { title: 'OWNER', emoji: '👑', commands: ['owner ✓', 'restart ✓ (owner only)', 'update ✓ (requires Git checkout)', 'clear ✓ (help message only)', 'pair ✓ (pairing guidance)'] },
+                        { title: 'GREETINGS', emoji: '👋', commands: ['greet list/create/edit/delete/schedule ✓ (depends on greeting setup)'] }
                     ];
                     const listText = [
                         '╭━━〔 ⚡ VFX MINI • FULL COMMAND MENU 〕━━╮',
@@ -689,7 +689,7 @@ ${PREFIX}autodl on/off
                             '╰────────────────────'
                         ]),
                         '',
-                        'Tip: Send ' + PREFIX + 'faq for pairing help.',
+                        '✓ = implemented in the current code. ⚠ NOT VERIFIED = not confirmed as working; do not rely on it.\nTip: Send ' + PREFIX + 'faq for pairing help.',
                         'Powered by SOURAJIT VFX • Levanter-inspired menu layout'
                     ].join('\n');
                     return await sock.sendMessage(from, { text: listText }, { quoted: msg });
