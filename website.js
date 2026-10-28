@@ -23,6 +23,38 @@ let sock = null;
 /* ============================================================
    🔥 VFX MINI — PREMIUM PAIRING PORTAL (NEW STYLE)
    ============================================================ */
+app.get('/faq', (req, res) => {
+    res.type('html').send(`<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#050b18"><title>VFX MINI • FAQ & How to Use</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 15% 0%,#063b68 0,transparent 35%),radial-gradient(ellipse at 100% 15%,#20115a 0,transparent 35%),#050b18;color:#edf6ff;font-family:Inter,system-ui,sans-serif}
+.wrap{width:min(900px,calc(100% - 28px));margin:auto}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:22px 0}.brand{font:800 17px Orbitron,sans-serif;letter-spacing:.04em}.brand span{color:#32dcff}.back{color:#dffaff;text-decoration:none;border:1px solid #24506d;border-radius:12px;padding:10px 13px;font-size:13px}
+.hero{padding:26px 0 18px}.eyebrow{color:#36dfff;font-size:11px;font-weight:800;letter-spacing:.18em}h1{font:800 clamp(28px,6vw,44px) Orbitron,sans-serif;line-height:1.2;margin:12px 0;background:linear-gradient(100deg,#fff,#64e8ff,#a99bff);color:transparent;background-clip:text}.muted{color:#9fb1cb;line-height:1.7;font-size:14px}
+.card{background:linear-gradient(145deg,#111d31ed,#091322f2);border:1px solid #203e5e;border-radius:20px;padding:20px;margin:14px 0;box-shadow:0 18px 55px #0004}.card h2{font-size:17px;margin:0 0 10px}.step{display:flex;gap:13px;margin:15px 0}.num{flex:0 0 30px;height:30px;border-radius:10px;display:grid;place-items:center;background:#10364b;color:#6ceaff;font-weight:800}.step p{margin:2px 0;color:#b9c9df;font-size:14px;line-height:1.65}.step b{color:#f4f8ff}.qa{border-top:1px solid #20334c;padding:14px 0}.qa:first-of-type{border-top:0}.qa h3{font-size:14px;margin:0 0 7px}.qa p{font-size:13px;color:#aebfd7;line-height:1.7;margin:0}.warn{border-color:#6c4d2b}.warn h2{color:#ffd38a}.footer{text-align:center;color:#657b9b;font-size:11px;padding:24px 0 36px}
+</style></head><body><div class="wrap"><header class="top"><div class="brand"><span>VFX</span> MINI <small style="display:block;font:500 10px Inter;color:#91a5c1;margin-top:5px">FAQ • HOW TO USE</small></div><a class="back" href="/"><i class="fa-solid fa-arrow-left"></i> Back to Pairing</a></header>
+<section class="hero"><div class="eyebrow">QUICK START GUIDE</div><h1>How to use VFX MINI</h1><p class="muted">Follow these steps to request a WhatsApp linking code. Only connect a WhatsApp account that you own or are authorised to manage.</p></section>
+<section class="card"><h2><i class="fa-solid fa-link" style="color:#4de4ff"></i> Pairing steps</h2>
+<div class="step"><span class="num">1</span><p><b>Open the Pairing Portal.</b><br>Go back to the home page and enter your phone number with country code, digits only (for example, India: 91 followed by your number).</p></div>
+<div class="step"><span class="num">2</span><p><b>Tap “GET PAIRING CODE”.</b><br>Wait for the server to respond. If it says the bot is starting, wait a few seconds and try once more.</p></div>
+<div class="step"><span class="num">3</span><p><b>Open WhatsApp on your phone.</b><br>Go to Settings or the three-dot menu → Linked devices → Link a device. If offered, choose “Link with phone number instead”.</p></div>
+<div class="step"><span class="num">4</span><p><b>Enter the code in WhatsApp.</b><br>Use the code shown on this website. Never share your pairing code or QR with anyone.</p></div>
+<div class="step"><span class="num">5</span><p><b>Wait for connection confirmation.</b><br>If pairing fails, verify the number format and server status. Do not repeatedly request codes or delete session files.</p></div>
+</section>
+<section class="card"><h2><i class="fa-solid fa-circle-question" style="color:#a99bff"></i> Frequently asked questions</h2>
+<div class="qa"><h3>Is the pairing code my WhatsApp password?</h3><p>No. It is a temporary device-linking code. Treat it as private because someone else could use it to link a device.</p></div>
+<div class="qa"><h3>Why is no code appearing?</h3><p>The server may be starting, offline, or already linked. Refresh once, wait a few seconds, and check the Koyeb deployment logs if the problem continues.</p></div>
+<div class="qa"><h3>What if WhatsApp says the code is invalid?</h3><p>Request a fresh code and enter it promptly. Make sure the number includes the country code and contains digits only.</p></div>
+<div class="qa"><h3>Will my session survive a redeploy?</h3><p>Only if the bot's authentication data is stored on a correctly configured persistent volume or other persistent storage. A deployment without persistent storage may lose local session files.</p></div>
+<div class="qa"><h3>Can this guarantee my WhatsApp account won't be banned?</h3><p>No. This is an unofficial WhatsApp Web integration, and account restrictions cannot be ruled out. Use responsibly and follow WhatsApp's terms.</p></div>
+<div class="qa"><h3>What does the .faq command do?</h3><p>In chats where the bot is connected, send <b>.faq</b> to receive a short guide. This website page is also available at <b>/faq</b>.</p></div>
+</section>
+<section class="card warn"><h2><i class="fa-solid fa-shield-halved"></i> Safety reminder</h2><p class="muted">Never share pairing codes, QR images, or session files. Only link your own account. A bot cannot guarantee uninterrupted service or prevent every account restriction.</p></section>
+<div class="footer">VFX MINI • Powered by SOURAJIT VFX</div></div></body></html>`);
+});
+
 app.get('/', (req, res) => {
     res.send(`
     <!DOCTYPE html>
@@ -465,7 +497,7 @@ app.get('/', (req, res) => {
             <ul class="nav-links" id="navLinks">
                 <li><a href="#"><i class="fa-solid fa-house"></i> Home</a></li>
                 <li><a href="#"><i class="fa-solid fa-link"></i> Pair</a></li>
-                <li><a href="#"><i class="fa-solid fa-book"></i> Docs</a></li>
+                <li><a href="/faq"><i class="fa-solid fa-book"></i> FAQ / How to use</a></li>
                 <li><a href="#"><i class="fa-solid fa-headset"></i> Support</a></li>
             </ul>
             <button class="hamburger" id="hamburger"><i class="fa-solid fa-bars"></i></button>
