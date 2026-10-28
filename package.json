@@ -1,7 +1,7 @@
 {
-  "name": "rahul-ai-mini",
+  "name": "vfx-mini",
   "version": "1.0.0",
-  "description": "RAHUL-AI-MINI WhatsApp Bot",
+  "description": "VFX MINI WhatsApp Bot with pairing website and modular command upgrade",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
