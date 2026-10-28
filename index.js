@@ -621,6 +621,7 @@ ${PREFIX}autodl on/off
                     '│ ' + PREFIX + 'mp3 <song>',
                     '│ ' + PREFIX + 'video <name or URL>',
                     '│ ' + PREFIX + 'insta <URL>',
+                    '│ ' + PREFIX + 'alldown <public URL>',
                     '╰─────────────────',
                     '',
                     '╭─❏ AI & SEARCH ❏',
