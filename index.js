@@ -19,6 +19,7 @@ const { exec } = require('child_process');
 const FormData = require('form-data');
 const registerWebsite = require('./website');
 const commandRegistry = require('./commands/loader');
+const greetingSystem = require('./greetings');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -252,6 +253,10 @@ async function connectToWhatsApp() {
 
             const from = msg.key.remoteJid;
             const text = msg.message.conversation || msg.message.extendedTextMessage?.text || msg.message.imageMessage?.caption || msg.message.videoMessage?.caption || '';
+            // Automatic greeting replies run before command parsing and skip the bot's own messages.
+            if (!msg.key.fromMe && text.trim()) {
+                await greetingSystem.handleIncoming(sock, msg, from, text).catch(err => console.error('[VFX MINI] Greeting error:', err.message));
+            }
 
             if (isAutoReact && !msg.key.fromMe && from !== 'status@broadcast') {
                 const emojis = ['❤️', '🔥', '⚡', '🤖', '👍', '⭐', '✨'];
@@ -313,7 +318,7 @@ async function connectToWhatsApp() {
             const command = body.toLowerCase().split(/\s+/)[0];
             const args = body.split(/\s+/).slice(1).join(' ');
             const noPrefixCommands = new Set([
-                'ai', 'alwaysonline', 'autodl', 'autoonline', 'autoreact', 'autostatus', 'autoupdate', 'calc', 'clear', 'fancy', 'font', 'fonts', 'fullpp', 'g', 'getpp', 'google', 'help', 'insta', 'instagram', 'menu', 'mp3', 'mute', 'owner', 'pair', 'ping', 'ping1', 'ping2', 'ping3', 'ping4', 'ping5', 'play', 'prefix', 'qr', 'quote', 'restart', 's', 'setprefix', 'settings', 'song', 'statusview', 'sticker', 'tagall', 'tourl', 'unmute', 'update', 'upload', 'uptime', 'video', 'vv', 'weather', 'yta', 'ytvideo'
+                'ai', 'alwaysonline', 'autodl', 'autoonline', 'autoreact', 'autostatus', 'autoupdate', 'calc', 'clear', 'fancy', 'font', 'fonts', 'fullpp', 'g', 'getpp', 'google', 'greet', 'greetings', 'help', 'insta', 'instagram', 'menu', 'mp3', 'mute', 'owner', 'pair', 'ping', 'ping1', 'ping2', 'ping3', 'ping4', 'ping5', 'play', 'prefix', 'qr', 'quote', 'restart', 's', 'setprefix', 'settings', 'song', 'statusview', 'sticker', 'tagall', 'tourl', 'unmute', 'update', 'upload', 'uptime', 'video', 'vv', 'weather', 'yta', 'ytvideo'
             ]);
             const isCmd = prefixed || noPrefixCommands.has(command);
 
@@ -350,6 +355,15 @@ async function connectToWhatsApp() {
             }
 
             if (!isCmd) return;
+
+            if (command === 'greet' || command === 'greetings') {
+                const handled = await greetingSystem.handleCommand({
+                    sock, msg, from, args: text.trim().split(/\\s+/).slice(1).join(' '),
+                    isOwner: Boolean(msg.key.fromMe),
+                    reply: async (message) => sock.sendMessage(from, { text: message }, { quoted: msg })
+                });
+                if (handled) return;
+            }
 
             const modularHandled = await commandRegistry.execute(command, {
                 sock,
@@ -604,6 +618,7 @@ ${PREFIX}autodl on/off
                     '┃ ◈ ' + PREFIX + 'vv (reply to view-once media)',
                     '┃ ◈ ' + PREFIX + 'pair (pairing portal)',
                     '┃ ◈ ' + PREFIX + 'uptime',
+                    '┃ ◈ ' + PREFIX + 'greet list/create/edit/delete/schedule',
                     '┃ ◈ ' + PREFIX + 'calc <math>',
                     '┃ ◈ ' + PREFIX + 'qr <text>',
                     '┃ ◈ ' + PREFIX + 'tourl (reply media)',
