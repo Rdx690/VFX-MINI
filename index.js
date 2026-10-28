@@ -658,7 +658,7 @@ ${PREFIX}autodl on/off
                     '',
                     'Note: Commands work only where implemented and permissions allow.',
                     'Powered by SOURAJIT VFX'
-                ].join('\\n');
+                ].join('\n');
                 return await sock.sendMessage(from, { text: menuText }, { quoted: msg });
                 try {
                     const page = await axios.get('https://ibb.co/HL6Ftn8P', { timeout: 12000 });
