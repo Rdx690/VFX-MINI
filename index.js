@@ -697,7 +697,7 @@ ${PREFIX}autodl on/off
                         '',
                         'Tip: Send ' + PREFIX + 'faq for pairing help.',
                         'Powered by SOURAJIT VFX • Levanter-inspired menu layout'
-                    ].join('\\n');
+                    ].join('\n');
                     return await sock.sendMessage(from, { text: listText }, { quoted: msg });
                 }
                 try {
