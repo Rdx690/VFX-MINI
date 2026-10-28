@@ -566,12 +566,6 @@ ${PREFIX}autodl on/off
                     ping4: `⚡━━━━━━━━ *VFX MINI* ━━━━━━━━⚡\n\n🚦 SYSTEM: READY\n📡 RESPONSE: ${latency} ms\n⏳ UPTIME: ${uptime}\n💾 RAM: ${ram} MB\n\n⚡ POWERED BY SOURAJITVFX`,
                     ping5: `╔═══════ ✨ *VFX MINI* ✨ ═══════╗\n║ Status  : 🟢 Online\n║ Latency : ${latency} ms\n║ Uptime  : ${uptime}\n║ RAM     : ${ram} MB\n╚════════════════════════════╝`
                 };
-                if (command === 'ping2') {
-                    for (const frame of ['⏳ *Checking connection…*', '⚡ *Measuring response…*', '🚀 *VFX MINI ONLINE*']) {
-                        await sock.sendMessage(from, { text: frame }, { quoted: msg });
-                        await delay(180);
-                    }
-                }
                 await sock.sendMessage(from, { text: styles[command] }, { quoted: msg });
             }
             else if (command === 'faq') {
