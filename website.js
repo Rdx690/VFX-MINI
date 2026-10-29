@@ -475,7 +475,7 @@ app.get('/', (req, res) => {
     <body>
         <div class="opening-splash" id="openingSplash" aria-label="VFX MINI loading">
             <div class="splash-orbit">
-                <img class="splash-logo" src="/brand-logo" alt="VFX MINI logo" onerror="this.onerror=null;this.src='https://ibb.co/HL6Ftn8P';">
+                <img class="splash-logo" src="https://d2jqrm6oza8nb6.cloudfront.net/datasets/5ae724ac-6064-4f04-936c-bce595f85e8f.png?_jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXlIYXNoIjoiYWFmNjU2MjcwNWIwYTBhOCIsImJ1Y2tldCI6InJ1bndheS1kYXRhc2V0cyIsInN0YWdlIjoicHJvZCIsImV4cCI6MTc5MzM2ODIzMX0.Fpt-v87pW_dC7qhuBtkA6MfQQ5hXqORSXM4xT8bJDqU" alt="Sourajit profile photo" style="width:76%;height:76%;object-fit:cover;object-position:center 25%;border-radius:50%;position:relative;z-index:2;border:2px solid rgba(0,229,255,.75);box-shadow:0 0 18px rgba(0,229,255,.45);" fetchpriority="high">
             </div>
             <div class="splash-title">VFX <span>MINI</span></div>
             <div class="splash-credit">POWERED BY SOURAJITVFX</div>
